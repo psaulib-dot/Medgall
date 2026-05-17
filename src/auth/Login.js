@@ -10,9 +10,10 @@ import VisibilityOffIcon from '@mui/icons-material/VisibilityOff';
 const LoginContainer = styled.div`
   display: flex;
   justify-content: center;
-  align-items: center;
+  align-items: flex-start;
   min-height: 100vh;
   background-color: #F7F4EE;
+  padding-top: 10vh;
   padding: var(--spacing-xl) var(--spacing-md);
 
   @media (min-width: 768px) {

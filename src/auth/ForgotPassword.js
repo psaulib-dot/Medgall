@@ -8,9 +8,10 @@ import { toastSuccess, toastError } from '../toast';
 const ForgotContainer = styled.div`
   display: flex;
   justify-content: center;
-  align-items: center;
+  align-items: flex-start;
   min-height: calc(100vh - var(--header-height));
   background-color: #F7F4EE;
+  padding-top: 10vh;
   padding: var(--spacing-xl) var(--spacing-md);
 
   @media (max-width: 480px) {
@@ -176,7 +177,7 @@ const ForgotPassword = () => {
             type="email"
             placeholder={t('forgot.email') || 'Enter your email'}
             value={email}
-            onChange={(e) => setEmail(e.target.value)}
+            onChange={(e) => setEmail(e.targe.value)}
             required
             disabled={loading}
           />
