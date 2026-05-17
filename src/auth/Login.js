@@ -117,6 +117,7 @@ const PasswordToggle = styled.button`
 
   &:hover {
     color: #6B4423;
+    transform: none;
   }
 
   svg {
