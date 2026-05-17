@@ -12,7 +12,7 @@ const SignUpContainer = styled.div`
   justify-content: center;
   align-items: center;
   min-height: calc(100vh - var(--header-height));
-  background: linear-gradient(135deg, #f5f0e8 0%, #e8dcc8 100%);
+  background-color: #F7F4EE;
   padding: 32px 16px 40px;
 
   @media (min-width: 768px) {
@@ -84,7 +84,7 @@ const PasswordToggle = styled.button`
   top: 50%;
   transform: translateY(-50%);
   background: none;
-  border: none;
+  border: 1px solid transparent;
   cursor: pointer;
   color: #8B5A2B;
   padding: 4px;
@@ -139,8 +139,9 @@ const LoginLink = styled.div`
   font-family: 'Georgia', serif;
 
   p {
+    display: inline;
     color: #5A4A3A;
-    margin: 0 0 8px;
+    margin: 0;
     font-size: 14px;
   }
 
@@ -150,6 +151,7 @@ const LoginLink = styled.div`
     font-size: 15px;
     font-weight: 700;
     transition: color 0.3s ease;
+    margin-inline-start: 4px;
 
     &:hover {
       color: #6B4423;
@@ -251,7 +253,7 @@ const SignUp = () => {
             type={showConfirmPassword ? 'text' : 'password'}
             placeholder={t('signup.confirmPassword')}
             value={confirmPassword}
-            onChange={(e) => setConfirmPassword(e.target.value)}
+            onChange={(e) => setConfirmPassword(e.targe.value)}
             required
             $hasIcon
           />

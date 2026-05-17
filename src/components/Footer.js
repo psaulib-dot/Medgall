@@ -14,7 +14,7 @@ import vision2030Image from '../images/ll.png';
 
 const FooterContainer = styled.footer`
   background: linear-gradient(135deg, var(--medhal-navy) 0%, #0a1420 100%);
-  padding: var(--spacing-3xl) var(--spacing-md);
+  padding: var(--spacing-2xl) var(--spacing-md);
   color: var(--medhal-white);
   text-align: center;
   font-family: var(--font-family-primary);
@@ -22,24 +22,24 @@ const FooterContainer = styled.footer`
   margin-top: var(--spacing-3xl);
 
   @media (min-width: 768px) {
-    padding: var(--spacing-3xl) var(--spacing-lg);
+    padding: var(--spacing-2xl) var(--spacing-lg);
   }
 
   @media (min-width: 1024px) {
-    padding: var(--spacing-3xl) var(--spacing-xl);
+    padding: var(--spacing-2xl) var(--spacing-xl);
   }
 `;
 
 const FooterContent = styled.div`
   display: grid;
   grid-template-columns: 1fr 1fr 1fr;
-  gap: var(--spacing-xl);
+  gap: var(--spacing-lg);
   max-width: var(--max-width-container);
-  margin: 0 auto var(--spacing-2xl);
+  margin: 0 auto var(--spacing-xl);
 
   @media (max-width: 768px) {
     grid-template-columns: 1fr;
-    gap: var(--spacing-lg);
+    gap: var(--spacing-md);
   }
 `;
 
@@ -48,8 +48,8 @@ const FooterSection = styled.div`
 `;
 
 const SectionTitle = styled.h4`
-  font-size: var(--font-size-lg);
-  margin-bottom: var(--spacing-lg);
+  font-size: var(--font-size-md);
+  margin-bottom: var(--spacing-md);
   color: var(--medhal-gold);
   font-weight: var(--font-weight-bold);
   font-family: var(--font-family-primary);
@@ -58,9 +58,9 @@ const SectionTitle = styled.h4`
 const LinkItem = styled.a`
   color: var(--medhal-cream);
   text-decoration: none;
-  margin-bottom: var(--spacing-md);
+  margin-bottom: var(--spacing-sm);
   display: block;
-  font-size: var(--font-size-sm);
+  font-size: var(--font-size-xs);
   transition: all var(--transition-fast);
   line-height: var(--line-height-relaxed);
 
@@ -73,9 +73,9 @@ const LinkItem = styled.a`
 const StyledLink = styled(Link)`
   color: var(--medhal-cream);
   text-decoration: none;
-  margin-bottom: var(--spacing-md);
+  margin-bottom: var(--spacing-sm);
   display: block;
-  font-size: var(--font-size-sm);
+  font-size: var(--font-size-xs);
   transition: all var(--transition-fast);
   line-height: var(--line-height-relaxed);
 
@@ -88,8 +88,8 @@ const StyledLink = styled(Link)`
 const SocialMediaContainer = styled.div`
   display: flex;
   justify-content: center;
-  gap: var(--spacing-md);
-  margin-bottom: var(--spacing-lg);
+  gap: var(--spacing-sm);
+  margin-bottom: var(--spacing-md);
   flex-wrap: wrap;
 `;
 
@@ -97,10 +97,10 @@ const SocialIcon = styled.a`
   display: flex;
   align-items: center;
   justify-content: center;
-  width: 48px;
-  height: 48px;
+  width: 40px;
+  height: 40px;
   background: rgba(198, 167, 94, 0.1);
-  border: 2px solid var(--medhal-gold);
+  border: 1px solid var(--medhal-gold);
   border-radius: var(--radius-full);
   color: var(--medhal-gold);
   transition: all var(--transition-base);
@@ -114,22 +114,23 @@ const SocialIcon = styled.a`
   }
 
   svg {
-    font-size: 24px;
+    font-size: 20px;
   }
 `;
 
 const LogosContainer = styled.div`
   display: flex;
-  gap: var(--spacing-lg);
+  gap: var(--spacing-md);
   align-items: center;
   justify-content: center;
   flex-wrap: wrap;
+  margin-bottom: var(--spacing-lg);
 `;
 
 const LogoWrapper = styled.div`
   background: rgba(255, 255, 255, 0.05);
-  padding: var(--spacing-md);
-  border-radius: var(--radius-lg);
+  padding: var(--spacing-sm);
+  border-radius: var(--radius-md);
   border: 1px solid rgba(198, 167, 94, 0.2);
   transition: all var(--transition-base);
 
@@ -140,7 +141,7 @@ const LogoWrapper = styled.div`
 `;
 
 const Logo = styled.img`
-  width: 100px;
+  width: 80px;
   height: auto;
   filter: drop-shadow(2px 4px 6px rgba(0, 0, 0, 0.3));
   transition: transform var(--transition-base);
@@ -151,7 +152,7 @@ const Logo = styled.img`
 `;
 
 const Vision2030Logo = styled.img`
-  width: 120px;
+  width: 100px;
   height: auto;
   filter: drop-shadow(2px 4px 6px rgba(0, 0, 0, 0.3));
   transition: transform var(--transition-base);
@@ -165,7 +166,7 @@ const Divider = styled.hr`
   border: none;
   height: 1px;
   background: linear-gradient(90deg, transparent, var(--medhal-gold), transparent);
-  margin: var(--spacing-xl) 0;
+  margin: var(--spacing-lg) 0;
 `;
 
 const FooterBottom = styled.div`
@@ -173,10 +174,10 @@ const FooterBottom = styled.div`
   justify-content: space-between;
   align-items: center;
   flex-wrap: wrap;
-  gap: var(--spacing-lg);
+  gap: var(--spacing-md);
   max-width: var(--max-width-container);
   margin: 0 auto;
-  padding-top: var(--spacing-xl);
+  padding-top: var(--spacing-lg);
   border-top: 1px solid rgba(198, 167, 94, 0.2);
 
   @media (max-width: 768px) {
@@ -186,7 +187,7 @@ const FooterBottom = styled.div`
 `;
 
 const Copyright = styled.p`
-  font-size: var(--font-size-sm);
+  font-size: var(--font-size-xs);
   color: var(--medhal-cream);
   margin: 0;
   line-height: var(--line-height-normal);
@@ -201,7 +202,7 @@ const Footer = () => {
       <FooterContent>
         {/* Links Section */}
         <FooterSection textAlign={isArabic ? 'right' : 'left'}>
-          <SectionTitle>{t('footer.importantLinks') || 'Important Links'}</SectionTitle>
+          <SectionTitle>{t('footer.importantLinks')}</SectionTitle>
           <LinkItem
             href="https://heritage.moc.gov.sa/"
             target="_blank"
@@ -229,8 +230,8 @@ const Footer = () => {
         </FooterSection>
 
         {/* Quick Navigation */}
-        <FooterSection textAlign={isArabic ? 'right' : 'center'}>
-          <SectionTitle>{t('footer.quickNav') || 'Quick Links'}</SectionTitle>
+        <FooterSection textAlign={isArabic ? 'right' : 'left'}>
+          <SectionTitle>{t('footer.quickNav')}</SectionTitle>
           <StyledLink to="/acplaces" dir={isArabic ? 'rtl' : 'ltr'}>
             {isArabic ? 'الوجهات والخريطة' : 'Destinations & Map'}
           </StyledLink>
@@ -244,7 +245,7 @@ const Footer = () => {
 
         {/* Social Media */}
         <FooterSection>
-          <SectionTitle>{t('footer.followUs') || 'Follow Us'}</SectionTitle>
+          <SectionTitle>{t('footer.followUs')}</SectionTitle>
           <SocialMediaContainer>
             <SocialIcon
               href="https://facebook.com/medhal"
@@ -296,10 +297,7 @@ const Footer = () => {
         </FooterSection>
       </FooterContent>
 
-      <Divider />
-
-      {/* Logos */}
-      <LogosContainer style={{ marginBottom: 'var(--spacing-2xl)' }}>
+      <LogosContainer>
         <LogoWrapper>
           <Logo src="/logo.png" alt="Medhal Logo" />
         </LogoWrapper>
@@ -313,7 +311,7 @@ const Footer = () => {
       {/* Footer Bottom */}
       <FooterBottom dir={isArabic ? 'rtl' : 'ltr'}>
         <Copyright>
-          © 2024-2026 {t('footer.medhal') || 'Medhal'}. {t('footer.allRightsReserved') || 'All rights reserved.'}
+          © 2024-2026 {t('footer.medhal')}. {t('footer.allRightsReserved')}
         </Copyright>
         <Copyright>
           {isArabic ? 'منصة سياحية ذكية تابعة لرؤية السعودية 2030' : 'A smart tourism platform for Saudi Arabia Vision 2030'}

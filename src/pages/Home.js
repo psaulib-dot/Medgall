@@ -149,11 +149,9 @@ const CardsWrapper = styled.div`
   padding: var(--spacing-3xl) clamp(var(--spacing-md), 6vw, 80px);
   background: transparent;
   z-index: 5;
-  margin-top: -60px;
 
   @media (max-width: 1024px) {
     padding: var(--spacing-2xl) clamp(var(--spacing-md), 5vw, 50px);
-    margin-top: -40px;
   }
 
   @media (max-width: 768px) {
@@ -176,9 +174,6 @@ const CardsContainer = styled.div`
   gap: 24px;
   width: 100%;
   margin-top: 0;
-  max-width: 1200px;
-  margin-left: auto;
-  margin-right: auto;
 
   @media (max-width: 1024px) {
     grid-template-columns: repeat(2, 1fr);
@@ -227,16 +222,6 @@ const Card = styled(CardBase)`
   }
 `;
 
-const DarkCard = styled(CardBase)`
-  background: var(--medhal-navy);
-  border-color: rgba(198, 167, 94, 0.3);
-  
-  &:hover {
-    background: rgba(15, 28, 46, 0.95);
-    border-color: rgba(198, 167, 94, 0.5);
-  }
-`;
-
 const CardIcon = styled.div`
   font-size: 48px;
   margin-bottom: 16px;
@@ -276,8 +261,7 @@ const AboutHomeSection = styled.section`
   box-shadow: 0 20px 50px rgba(15, 28, 46, 0.08);
   padding: 40px;
   margin: var(--spacing-2xl) auto;
-  max-width: 1200px;
-  width: calc(100% - var(--spacing-xl));
+  width: 100%;
   display: grid;
   grid-template-columns: minmax(260px, 320px) 1fr;
   gap: 32px;
@@ -401,40 +385,6 @@ const Home = () => {
         </HeroContent>
       </HeroSection>
 
-      <AboutHomeSection>
-        <AboutLogo src="/logo.png" alt={isArabic ? 'شعار مدهال' : 'Medhal Logo'} />
-        <AboutText>
-          <AboutHeading>
-            {isArabic ? 'منصة مدهال السياحية' : 'About Medhal'}
-          </AboutHeading>
-          <AboutParagraph>
-            {isArabic
-              ? 'مدهال منصة سياحية ذكية ثنائية اللغة تساعد الزوار على اكتشاف أفضل الوجهات والتراث والخدمات العامة داخل المملكة بجودة عالية وسهولة استخدام.'
-              : 'Medhal is a smart bilingual tourism platform that helps visitors discover top destinations, heritage sites, and essential public services across the Kingdom with clarity and ease.'}
-          </AboutParagraph>
-          <AboutHighlights>
-            <HighlightItem>
-              <HighlightBullet />
-              <HighlightText>
-                {isArabic ? 'معلومات محدثة عن المواقع الأثرية والسياحية.' : 'Up-to-date details for heritage and tourism sites.'}
-              </HighlightText>
-            </HighlightItem>
-            <HighlightItem>
-              <HighlightBullet />
-              <HighlightText>
-                {isArabic ? 'خرائط تفاعلية وروابط اتجاهات مباشرة.' : 'Interactive maps and direct direction links.'}
-              </HighlightText>
-            </HighlightItem>
-            <HighlightItem>
-              <HighlightBullet />
-              <HighlightText>
-                {isArabic ? 'عرض شامل للفنادق والمطاعم والخدمات الأساسية.' : 'Comprehensive hotel, restaurant, and service listings.'}
-              </HighlightText>
-            </HighlightItem>
-          </AboutHighlights>
-        </AboutText>
-      </AboutHomeSection>
-
       <CardsWrapper $isArabic={isArabic}>
         <CardsContainer>
           {/* Card 1 - Explore The Sites */}
@@ -478,7 +428,39 @@ const Home = () => {
         </CardsContainer>
       </CardsWrapper>
 
-
+      <AboutHomeSection>
+        <AboutLogo src="/logo.png" alt={isArabic ? 'شعار مدهال' : 'Medhal Logo'} />
+        <AboutText>
+          <AboutHeading>
+            {isArabic ? 'منصة مدهال السياحية' : 'About Medhal'}
+          </AboutHeading>
+          <AboutParagraph>
+            {isArabic
+              ? 'مدهال منصة سياحية ذكية ثنائية اللغة تساعد الزوار على اكتشاف أفضل الوجهات والتراث والخدمات العامة داخل المملكة بجودة عالية وسهولة استخدام.'
+              : 'Medhal is a smart bilingual tourism platform that helps visitors discover top destinations, heritage sites, and essential public services across the Kingdom with clarity and ease.'}
+          </AboutParagraph>
+          <AboutHighlights>
+            <HighlightItem>
+              <HighlightBullet />
+              <HighlightText>
+                {isArabic ? 'معلومات محدثة عن المواقع الأثرية والسياحية.' : 'Up-to-date details for heritage and tourism sites.'}
+              </HighlightText>
+            </HighlightItem>
+            <HighlightItem>
+              <HighlightBullet />
+              <HighlightText>
+                {isArabic ? 'خرائط تفاعلية وروابط اتجاهات مباشرة.' : 'Interactive maps and direct direction links.'}
+              </HighlightText>
+            </HighlightItem>
+            <HighlightItem>
+              <HighlightBullet />
+              <HighlightText>
+                {isArabic ? 'عرض شامل للفنادق والمطاعم والخدمات الأساسية.' : 'Comprehensive hotel, restaurant, and service listings.'}
+              </HighlightText>
+            </HighlightItem>
+          </AboutHighlights>
+        </AboutText>
+      </AboutHomeSection>
     
     </div>
   );

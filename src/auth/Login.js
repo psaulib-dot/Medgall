@@ -11,8 +11,8 @@ const LoginContainer = styled.div`
   display: flex;
   justify-content: center;
   align-items: center;
-  min-height: calc(100vh - var(--header-height));
-  background: linear-gradient(135deg, var(--medhal-cream) 0%, #e8dcc8 100%);
+  min-height: 100vh;
+  background-color: #F7F4EE;
   padding: var(--spacing-xl) var(--spacing-md);
 
   @media (min-width: 768px) {
@@ -32,6 +32,7 @@ const LoginForm = styled.form`
   width: 100%;
   max-width: 420px;
   border: 2px solid var(--medhal-gold-light);
+  text-align: center;
 
   @media (min-width: 768px) {
     padding: 44px 40px;
@@ -41,6 +42,11 @@ const LoginForm = styled.form`
     padding: var(--spacing-xl) var(--spacing-md);
     border-radius: var(--radius-xl);
   }
+`;
+
+const Logo = styled.img`
+  width: 150px;
+  margin-bottom: var(--spacing-lg);
 `;
 
 const Title = styled.h2`
@@ -117,11 +123,20 @@ const PasswordToggle = styled.button`
   }
 `;
 
-const ButtonWrapper = styled.div`
-  display: flex;
-  justify-content: center;
-  margin: var(--spacing-xl) 0 0 0;
-  width: 100%;
+const ForgotPasswordLink = styled(Link)`
+  display: block;
+  text-align: ${props => (props.isArabic ? 'left' : 'right')};
+  margin-top: -12px;
+  margin-bottom: var(--spacing-md);
+  font-size: var(--font-size-xs);
+  color: var(--medhal-gold-dark);
+  text-decoration: none;
+  transition: color var(--transition-fast);
+
+  &:hover {
+    color: #6B4423;
+    text-decoration: underline;
+  }
 `;
 
 const Button = styled.button`
@@ -167,8 +182,9 @@ const SignupLink = styled.div`
   font-family: var(--font-family-primary);
 
   p {
+    display: inline;
     color: var(--medhal-text-secondary);
-    margin: 0 0 var(--spacing-sm);
+    margin: 0;
     font-size: var(--font-size-sm);
   }
 
@@ -178,6 +194,7 @@ const SignupLink = styled.div`
     font-size: var(--font-size-sm);
     font-weight: var(--font-weight-bold);
     transition: color var(--transition-fast);
+    margin-inline-start: 4px;
 
     &:hover {
       color: #6B4423;
@@ -200,34 +217,39 @@ const Login = ({ onLogin = () => {} }) => {
     setLoading(true);
 
     try {
+      let userRole = 'visitor'; // Default role
+
       if (isSupabaseConfigured) {
         const { authData, profile } = await signInUser({ email, password });
+        userRole = profile?.role || 'visitor';
         localStorage.setItem('authToken', authData.access_token);
-        localStorage.setItem('userRole', profile?.role || 'visitor');
+        localStorage.setItem('userRole', userRole);
         localStorage.setItem('userEmail', profile?.email || email);
         localStorage.setItem('userName', profile?.username || email);
-        onLogin(profile?.role || 'visitor');
-        toastSuccess(isArabic ? 'تم تسجيل الدخول بنجاح' : 'Logged in successfully');
-        navigate('/acplaces');
-        return;
+      } else {
+        const existingUser = JSON.parse(localStorage.getItem('medhalUsers') || '[]').find((user) => user.email === email && user.password === password);
+        if (!existingUser) {
+          toastError(isArabic ? 'البريد الإلكتروني أو كلمة المرور غير صحيحة' : 'Invalid email or password');
+          setLoading(false);
+          return;
+        }
+        userRole = existingUser.role || 'visitor';
+        const token = `local-${Date.now()}`;
+        localStorage.setItem('authToken', token);
+        localStorage.setItem('userRole', userRole);
+        localStorage.setItem('userEmail', existingUser.email);
+        localStorage.setItem('userName', existingUser.username || existingUser.email);
       }
 
-      const existingUser = JSON.parse(localStorage.getItem('medhalUsers') || '[]').find((user) => user.email === email && user.password === password);
-
-      if (!existingUser) {
-        toastError(isArabic ? 'البريد الإلكتروني أو كلمة المرور غير صحيحة' : 'Invalid email or password');
-        setLoading(false);
-        return;
-      }
-
-      const token = `local-${Date.now()}`;
-      localStorage.setItem('authToken', token);
-      localStorage.setItem('userRole', existingUser.role || 'visitor');
-      localStorage.setItem('userEmail', existingUser.email);
-      localStorage.setItem('userName', existingUser.username || existingUser.email);
-      onLogin(existingUser.role || 'visitor');
+      onLogin(userRole);
       toastSuccess(isArabic ? 'تم تسجيل الدخول بنجاح' : 'Logged in successfully');
-      navigate('/acplaces');
+
+      // Role-based redirection
+      if (userRole === 'admin') {
+        navigate('/admin-dashboard');
+      } else {
+        navigate('/visitor-dashboard');
+      }
     } catch (err) {
       toastError(err.message || (isArabic ? 'تعذر تسجيل الدخول' : 'Login failed'));
     } finally {
@@ -238,11 +260,12 @@ const Login = ({ onLogin = () => {} }) => {
   return (
     <LoginContainer dir={isArabic ? 'rtl' : 'ltr'}>
       <LoginForm onSubmit={handleSubmit}>
-        <Title>{t('login.title') || 'Login'}</Title>
+        <Logo src="/logo.png" alt="Medhal Logo" />
+        <Title>{t('login.title')}</Title>
         <InputWrapper>
           <Input
             type="email"
-            placeholder={t('login.username') || 'Enter email'}
+            placeholder={t('login.username')}
             value={email}
             onChange={(e) => setEmail(e.target.value)}
             required
@@ -252,7 +275,7 @@ const Login = ({ onLogin = () => {} }) => {
         <InputWrapper>
           <Input
             type={showPassword ? 'text' : 'password'}
-            placeholder={t('login.password') || 'Enter password'}
+            placeholder={t('login.password')}
             value={password}
             onChange={(e) => setPassword(e.target.value)}
             required
@@ -267,19 +290,17 @@ const Login = ({ onLogin = () => {} }) => {
             {showPassword ? <VisibilityOffIcon /> : <VisibilityIcon />}
           </PasswordToggle>
         </InputWrapper>
-        <ButtonWrapper>
-          <Button type="submit" disabled={loading}>
-            {loading ? (t('login.loading') || 'Loading...') : (t('login.submit') || 'Login')}
-          </Button>
-        </ButtonWrapper>
+        <ForgotPasswordLink to="/forgot" isArabic={isArabic}>
+          {t('login.forgotPassword')}
+        </ForgotPasswordLink>
+
+        <Button type="submit" disabled={loading}>
+          {loading ? t('login.loading') : t('login.submit')}
+        </Button>
 
         <SignupLink>
-          <p>{t('login.noAccount') || "Don't have an account?"}</p>
-          <Link to="/signup">{t('login.signUp') || 'Sign Up'}</Link>
-        </SignupLink>
-
-        <SignupLink>
-          <Link to="/forgot">{t('login.forgotPassword') || 'Forgot Password?'}</Link>
+          <p>{t('login.noAccount')}</p>
+          <Link to="/signup">{t('login.signUp')}</Link>
         </SignupLink>
       </LoginForm>
     </LoginContainer>

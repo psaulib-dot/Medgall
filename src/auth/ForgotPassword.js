@@ -10,7 +10,7 @@ const ForgotContainer = styled.div`
   justify-content: center;
   align-items: center;
   min-height: calc(100vh - var(--header-height));
-  background: linear-gradient(135deg, var(--medhal-cream) 0%, #e8dcc8 100%);
+  background-color: #F7F4EE;
   padding: var(--spacing-xl) var(--spacing-md);
 
   @media (max-width: 480px) {
@@ -26,6 +26,7 @@ const ForgotForm = styled.form`
   width: 100%;
   max-width: 420px;
   border: 2px solid var(--medhal-gold-light);
+  text-align: center;
 
   @media (min-width: 768px) {
     padding: 44px 40px;
@@ -35,6 +36,11 @@ const ForgotForm = styled.form`
     padding: var(--spacing-xl) var(--spacing-md);
     border-radius: var(--radius-xl);
   }
+`;
+
+const Logo = styled.img`
+  width: 150px;
+  margin-bottom: var(--spacing-lg);
 `;
 
 const Title = styled.h2`
@@ -81,15 +87,8 @@ const Input = styled.input`
   }
 `;
 
-const ButtonWrapper = styled.div`
-  display: flex;
-  justify-content: center;
-  margin: var(--spacing-xl) 0 0 0;
-  width: 100%;
-`;
-
 const Button = styled.button`
-  width: 50%;
+  width: 70%;
   padding: var(--spacing-md) var(--spacing-lg);
   background: linear-gradient(135deg, var(--medhal-gold-dark) 0%, #6B4423 100%);
   color: var(--medhal-white);
@@ -116,12 +115,6 @@ const Button = styled.button`
     opacity: 0.6;
     cursor: not-allowed;
     transform: none;
-  }
-
-  @media (max-width: 480px) {
-    width: 70%;
-    padding: var(--spacing-md) var(--spacing-md);
-    font-size: var(--font-size-sm);
   }
 `;
 
@@ -176,6 +169,7 @@ const ForgotPassword = () => {
   return (
     <ForgotContainer dir={i18n.language === 'ar' ? 'rtl' : 'ltr'}>
       <ForgotForm onSubmit={handleSubmit}>
+        <Logo src="/logo.png" alt="Medhal Logo" />
         <Title>{t('forgot.title') || 'Reset Password'}</Title>
         <InputWrapper>
           <Input
@@ -188,11 +182,9 @@ const ForgotPassword = () => {
           />
         </InputWrapper>
 
-        <ButtonWrapper>
-          <Button type="submit" disabled={loading}>
-            {loading ? (t('forgot.loading') || 'Sending...') : (t('forgot.submit') || 'Send Reset Link')}
-          </Button>
-        </ButtonWrapper>
+        <Button type="submit" disabled={loading}>
+          {loading ? (t('forgot.loading') || 'Sending...') : (t('forgot.submit') || 'Send Reset Link')}
+        </Button>
 
         <LoginLink>
           <Link to="/login">{t('forgot.backToLogin') || 'Back to Login'}</Link>
