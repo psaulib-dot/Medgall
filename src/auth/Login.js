@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import styled from 'styled-components';
 import { useTranslation } from 'react-i18next';
+import { useAuth } from '../hooks/useAuth'; // Import useAuth
 import { isSupabaseConfigured, signInUser } from '../supabaseService';
 import { toastSuccess, toastError } from '../toast';
 import VisibilityIcon from '@mui/icons-material/Visibility';
@@ -205,7 +206,7 @@ const SignupLink = styled.div`
   }
 `;
 
-const Login = ({ onLogin = () => {} }) => {
+const Login = () => { // Remove onLogin from props
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [showPassword, setShowPassword] = useState(false);
@@ -213,6 +214,7 @@ const Login = ({ onLogin = () => {} }) => {
   const navigate = useNavigate();
   const { t, i18n } = useTranslation();
   const isArabic = i18n.language === 'ar';
+  const { signIn } = useAuth(); // Use useAuth hook
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -222,9 +224,12 @@ const Login = ({ onLogin = () => {} }) => {
       let userRole = 'visitor'; // Default role
 
       if (isSupabaseConfigured) {
-        const { authData, profile } = await signInUser({ email, password });
+        const { data, error } = await signIn({ email, password }); // Use signIn from useAuth
+        if (error) throw error;
+
+        const profile = await getProfile(data.user.id);
         userRole = profile?.role || 'visitor';
-        localStorage.setItem('authToken', authData.access_token);
+
         localStorage.setItem('userRole', userRole);
         localStorage.setItem('userEmail', profile?.email || email);
         localStorage.setItem('userName', profile?.username || email);
@@ -243,7 +248,6 @@ const Login = ({ onLogin = () => {} }) => {
         localStorage.setItem('userName', existingUser.username || existingUser.email);
       }
 
-      onLogin(userRole);
       toastSuccess(isArabic ? 'تم تسجيل الدخول بنجاح' : 'Logged in successfully');
 
       // Role-based redirection
@@ -310,3 +314,10 @@ const Login = ({ onLogin = () => {} }) => {
 };
 
 export default Login;
+
+// Add getProfile function for fetching user profile
+const getProfile = async (id) => {
+  if (!isSupabaseConfigured) return null;
+  const { data } = await supabase.from('profiles').select('*').eq('id', id).single();
+  return data;
+};
