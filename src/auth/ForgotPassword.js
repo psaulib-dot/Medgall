@@ -39,8 +39,8 @@ const ForgotForm = styled.form`
 `;
 
 const Logo = styled.img`
-  width: 150px;
-  margin-bottom: var(--spacing-lg);
+  width: 100px;
+  margin: 0 auto var(--spacing-lg);
 `;
 
 const Title = styled.h2`
