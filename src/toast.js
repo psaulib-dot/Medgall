@@ -1,5 +1,4 @@
 import { toast } from 'react-toastify';
-import styled from 'styled-components';
 
 // Custom Toast Notification Styles
 const toastOptionsBase = {
