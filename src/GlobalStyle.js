@@ -6,14 +6,19 @@ const GlobalStyle = createGlobalStyle`
     /* Color Palette */
     --medhal-navy: #0F1C2E;
     --medhal-gold: #C6A75E;
+    --medhal-gold-light: #D4B896;
+    --medhal-gold-dark: #8B5A2B;
     --medhal-cream: #F7F4EE;
+    --medhal-white: #FFFFFF;
     --medhal-text: #1F2937;
+    --medhal-text-secondary: #5A4A3A;
     --medhal-muted: #5F6470;
     --medhal-light-gray: #E5E7EB;
     --medhal-border: #D1D5DB;
     --medhal-success: #10B981;
     --medhal-error: #EF4444;
     --medhal-warning: #F59E0B;
+    --medhal-info: #3B82F6;
     
     /* Spacing Scale (8px base) */
     --spacing-xs: 4px;
@@ -24,33 +29,73 @@ const GlobalStyle = createGlobalStyle`
     --spacing-2xl: 48px;
     --spacing-3xl: 64px;
     
-    /* Typography */
-    --font-family-primary: Georgia, 'Times New Roman', Tahoma, Arial, sans-serif;
+    /* Typography - Responsive */
+    --font-family-primary: Georgia, 'Times New Roman', serif;
     --font-family-secondary: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', sans-serif;
-    --font-size-xs: 12px;
-    --font-size-sm: 14px;
-    --font-size-base: 16px;
-    --font-size-lg: 18px;
-    --font-size-xl: 20px;
-    --font-size-2xl: 24px;
-    --font-size-3xl: 32px;
+    
+    /* Mobile First Font Sizes */
+    --font-size-xs: 11px;
+    --font-size-sm: 13px;
+    --font-size-base: 14px;
+    --font-size-lg: 16px;
+    --font-size-xl: 18px;
+    --font-size-2xl: 20px;
+    --font-size-3xl: 24px;
+    --font-size-4xl: 28px;
+    --font-size-5xl: 32px;
+    
+    /* Desktop Font Sizes */
+    @media (min-width: 768px) {
+      --font-size-xs: 12px;
+      --font-size-sm: 14px;
+      --font-size-base: 16px;
+      --font-size-lg: 18px;
+      --font-size-xl: 20px;
+      --font-size-2xl: 24px;
+      --font-size-3xl: 28px;
+      --font-size-4xl: 32px;
+      --font-size-5xl: 36px;
+    }
+    
+    /* Large Desktop Font Sizes */
+    @media (min-width: 1280px) {
+      --font-size-xs: 12px;
+      --font-size-sm: 14px;
+      --font-size-base: 16px;
+      --font-size-lg: 18px;
+      --font-size-xl: 20px;
+      --font-size-2xl: 24px;
+      --font-size-3xl: 32px;
+      --font-size-4xl: 36px;
+      --font-size-5xl: 40px;
+    }
+    
+    /* Font Weights */
+    --font-weight-light: 300;
+    --font-weight-normal: 400;
+    --font-weight-medium: 500;
+    --font-weight-semibold: 600;
+    --font-weight-bold: 700;
     
     /* Line Heights */
     --line-height-tight: 1.2;
     --line-height-normal: 1.5;
     --line-height-relaxed: 1.75;
+    --line-height-loose: 2;
     
     /* Shadows */
     --shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
     --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
     --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
     --shadow-xl: 0 20px 25px -5px rgba(0, 0, 0, 0.1);
+    --shadow-2xl: 0 25px 50px -12px rgba(0, 0, 0, 0.15);
     
     /* Border Radius */
     --radius-sm: 4px;
     --radius-md: 8px;
     --radius-lg: 12px;
     --radius-xl: 16px;
+    --radius-2xl: 20px;
     --radius-full: 9999px;
     
     /* Transitions */
@@ -59,8 +104,12 @@ const GlobalStyle = createGlobalStyle`
     --transition-slow: 350ms ease-in-out;
     
     /* Layout */
-    --header-height: 78px;
+    --header-height: 70px;
     --max-width-container: 1200px;
+    
+    @media (min-width: 768px) {
+      --header-height: 78px;
+    }
   }
 
   /* ===== Reset & Base Styles ===== */

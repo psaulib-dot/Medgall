@@ -12,6 +12,94 @@ code {
   font-family: source-code-pro, Menlo, Monaco, Consolas, 'Courier New', monospace;
 }
 
+/* ===== Custom Toast Notifications ===== */
+.Toastify__toast-container {
+  width: auto;
+  max-width: 500px;
+  padding: var(--spacing-md);
+  z-index: 9999;
+  top: var(--spacing-xl) !important;
+}
+
+.Toastify__toast {
+  background: transparent;
+  box-shadow: none;
+  border: none;
+  padding: 0;
+  margin-bottom: var(--spacing-md);
+}
+
+.Toastify__toast--success,
+.Toastify__toast--error,
+.Toastify__toast--warning,
+.Toastify__toast--info {
+  background: transparent;
+  box-shadow: none;
+  border-radius: var(--radius-lg);
+}
+
+.custom-toast-body {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-md);
+  font-family: var(--font-family-primary);
+  line-height: var(--line-height-normal);
+  font-size: var(--font-size-base);
+}
+
+.Toastify__toast-icon {
+  width: 20px;
+  min-width: 20px;
+  height: 20px;
+  margin-top: 2px;
+}
+
+.Toastify__progress-bar {
+  height: 3px;
+  border-radius: 2px;
+}
+
+.Toastify__progress-bar--success {
+  background: rgba(255, 255, 255, 0.6);
+}
+
+.Toastify__progress-bar--error {
+  background: rgba(255, 255, 255, 0.6);
+}
+
+.Toastify__progress-bar--warning {
+  background: rgba(255, 255, 255, 0.6);
+}
+
+.Toastify__progress-bar--info {
+  background: rgba(255, 255, 255, 0.6);
+}
+
+.Toastify__close-button {
+  color: rgba(255, 255, 255, 0.8);
+  opacity: 1;
+  transition: opacity var(--transition-fast);
+}
+
+.Toastify__close-button:hover {
+  opacity: 1;
+  color: #FFFFFF;
+}
+
+/* Mobile Responsive */
+@media (max-width: 480px) {
+  .Toastify__toast-container {
+    max-width: calc(100vw - var(--spacing-lg));
+    width: 100%;
+    left: var(--spacing-md) !important;
+    right: var(--spacing-md) !important;
+  }
+  
+  .custom-toast-body {
+    font-size: var(--font-size-sm);
+  }
+}
+
 /* Print styles */
 @media print {
   body {
@@ -19,6 +107,10 @@ code {
   }
   
   .no-print {
+    display: none !important;
+  }
+  
+  .Toastify__toast-container {
     display: none !important;
   }
 }

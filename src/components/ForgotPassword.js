@@ -10,59 +10,69 @@ const ForgotContainer = styled.div`
   justify-content: center;
   align-items: center;
   min-height: calc(100vh - var(--header-height));
-  background: linear-gradient(135deg, #f5f0e8 0%, #e8dcc8 100%);
-  padding: 32px 16px 40px;
+  background: linear-gradient(135deg, var(--medhal-cream) 0%, #e8dcc8 100%);
+  padding: var(--spacing-xl) var(--spacing-md);
+
+  @media (max-width: 480px) {
+    padding: var(--spacing-lg) var(--spacing-sm);
+  }
 `;
 
 const ForgotForm = styled.form`
-  background: linear-gradient(145deg, #ffffff 0%, #faf8f5 100%);
-  padding: 36px 24px;
-  border-radius: 20px;
+  background: linear-gradient(145deg, var(--medhal-white) 0%, #faf8f5 100%);
+  padding: var(--spacing-2xl) var(--spacing-lg);
+  border-radius: var(--radius-2xl);
   box-shadow: 0 16px 40px rgba(139, 90, 43, 0.15);
   width: 100%;
   max-width: 420px;
-  border: 2px solid #C6A75E;
+  border: 2px solid var(--medhal-gold-light);
 
   @media (min-width: 768px) {
     padding: 44px 40px;
   }
+
+  @media (max-width: 480px) {
+    padding: var(--spacing-xl) var(--spacing-md);
+    border-radius: var(--radius-xl);
+  }
 `;
 
 const Title = styled.h2`
-  color: #8B5A2B;
-  margin: 0 0 28px;
+  color: var(--medhal-gold-dark);
+  margin: 0 0 var(--spacing-lg);
   text-align: center;
-  font-size: 28px;
-  font-weight: 700;
-  font-family: 'Georgia', serif;
+  font-size: var(--font-size-3xl);
+  font-weight: var(--font-weight-bold);
+  font-family: var(--font-family-primary);
+  line-height: var(--line-height-tight);
 
-  @media (min-width: 768px) {
-    font-size: 32px;
-    margin-bottom: 32px;
+  @media (max-width: 480px) {
+    font-size: var(--font-size-2xl);
+    margin-bottom: var(--spacing-md);
   }
 `;
 
 const InputWrapper = styled.div`
   position: relative;
-  margin-bottom: 20px;
+  margin-bottom: var(--spacing-lg);
   width: 100%;
 `;
 
 const Input = styled.input`
   width: 100%;
-  padding: 14px 16px;
-  border-radius: 12px;
-  border: 2px solid #D4B896;
+  padding: var(--spacing-md) var(--spacing-md);
+  border-radius: var(--radius-lg);
+  border: 2px solid var(--medhal-gold-light);
   box-sizing: border-box;
-  font-size: 16px;
-  background-color: #ffffff;
-  color: #5A4A3A;
-  transition: all 0.3s ease;
-  font-family: 'Georgia', serif;
+  font-size: var(--font-size-base);
+  background-color: var(--medhal-white);
+  color: var(--medhal-text-secondary);
+  transition: all var(--transition-base);
+  font-family: var(--font-family-primary);
 
   &:focus {
     outline: none;
-    border-color: #8B5A2B;
+    border-color: var(--medhal-gold-dark);
     box-shadow: 0 0 0 4px rgba(139, 90, 43, 0.1);
   }
 
@@ -71,20 +81,25 @@ const Input = styled.input`
   }
 `;
 
-const Button = styled.button`
+const ButtonWrapper = styled.div`
+  display: flex;
+  justify-content: center;
+  margin: var(--spacing-xl) 0 0 0;
   width: 100%;
-  margin: 24px auto 0;
-  display: block;
-  padding: 14px 24px;
-  background: linear-gradient(135deg, #8B5A2B 0%, #6B4423 100%);
-  color: #ffffff;
+`;
+
+const Button = styled.button`
+  width: 50%;
+  padding: var(--spacing-md) var(--spacing-lg);
+  background: linear-gradient(135deg, var(--medhal-gold-dark) 0%, #6B4423 100%);
+  color: var(--medhal-white);
   border: none;
-  border-radius: 12px;
+  border-radius: var(--radius-lg);
   cursor: pointer;
-  font-weight: 700;
-  font-size: 16px;
-  font-family: 'Georgia', serif;
-  transition: all 0.3s ease;
+  font-weight: var(--font-weight-bold);
+  font-size: var(--font-size-base);
+  font-family: var(--font-family-primary);
+  transition: all var(--transition-base);
   box-shadow: 0 4px 12px rgba(139, 90, 43, 0.3);
 
   &:hover {
@@ -96,19 +111,31 @@ const Button = styled.button`
   &:active {
     transform: translateY(0);
   }
+
+  &:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+    transform: none;
+  }
+
+  @media (max-width: 480px) {
+    width: 70%;
+    padding: var(--spacing-md) var(--spacing-md);
+    font-size: var(--font-size-sm);
+  }
 `;
 
 const LoginLink = styled.div`
-  margin-top: 24px;
+  margin-top: var(--spacing-lg);
   text-align: center;
-  font-family: 'Georgia', serif;
+  font-family: var(--font-family-primary);
 
   a {
-    color: #8B5A2B;
+    color: var(--medhal-gold-dark);
     text-decoration: none;
-    font-size: 15px;
-    font-weight: 700;
-    transition: color 0.3s ease;
+    font-size: var(--font-size-sm);
+    font-weight: var(--font-weight-bold);
+    transition: color var(--transition-fast);
 
     &:hover {
       color: #6B4423;
@@ -120,45 +147,55 @@ const LoginLink = styled.div`
 const ForgotPassword = () => {
   const { t, i18n } = useTranslation();
   const [email, setEmail] = useState('');
+  const [loading, setLoading] = useState(false);
 
   const handleSubmit = async (e) => {
     e.preventDefault();
 
     if (!email) {
-      toastError(t('forgot.errorEmailRequired'));
+      toastError(t('forgot.errorEmailRequired') || 'Please enter your email');
       return;
     }
 
     try {
+      setLoading(true);
       if (!isSupabaseConfigured) {
-        throw new Error(t('forgot.supabaseNotConfigured'));
+        throw new Error(t('forgot.supabaseNotConfigured') || 'Supabase not configured');
       }
 
       await sendPasswordResetEmail(email);
-      toastSuccess(t('forgot.success'));
+      toastSuccess(t('forgot.success') || 'Check your email for password reset link');
+      setEmail('');
     } catch (err) {
-      toastError(err.message || t('forgot.failure'));
+      toastError(err.message || t('forgot.failure') || 'Failed to send reset email');
+    } finally {
+      setLoading(false);
     }
   };
 
   return (
     <ForgotContainer dir={i18n.language === 'ar' ? 'rtl' : 'ltr'}>
       <ForgotForm onSubmit={handleSubmit}>
-        <Title>{t('forgot.title')}</Title>
+        <Title>{t('forgot.title') || 'Reset Password'}</Title>
         <InputWrapper>
           <Input
             type="email"
-            placeholder={t('forgot.email')}
+            placeholder={t('forgot.email') || 'Enter your email'}
             value={email}
             onChange={(e) => setEmail(e.target.value)}
             required
+            disabled={loading}
           />
         </InputWrapper>
 
-        <Button type="submit">{t('forgot.submit')}</Button>
+        <ButtonWrapper>
+          <Button type="submit" disabled={loading}>
+            {loading ? (t('forgot.loading') || 'Sending...') : (t('forgot.submit') || 'Send Reset Link')}
+          </Button>
+        </ButtonWrapper>
 
         <LoginLink>
-          <Link to="/login">{t('forgot.backToLogin')}</Link>
+          <Link to="/login">{t('forgot.backToLogin') || 'Back to Login'}</Link>
         </LoginLink>
       </ForgotForm>
     </ForgotContainer>

@@ -38,7 +38,7 @@ function App() {
       <GlobalStyle />
       <Header />
       <ToastContainer
-        position="top-right"
+        position="top-center"
         autoClose={5000}
         hideProgressBar={false}
         newestOnTop={true}
@@ -47,14 +47,6 @@ function App() {
         pauseOnHover
         draggable
         theme="colored"
-        toastStyle={{
-          borderRadius: '16px',
-          background: '#0F1C2E',
-          color: '#F7F4EE',
-          fontFamily: 'Georgia, serif',
-          boxShadow: '0 16px 36px rgba(0, 0, 0, 0.18)',
-        }}
-        bodyStyle={{ margin: 0, padding: '12px 14px', fontFamily: 'Georgia, serif' }}
       />
       <main className="container" style={{ flex: 1, display: 'flex', flexDirection: 'column' }}>
         <Routes>
