@@ -283,4 +283,60 @@ export const submitContactMessage = async ({ name, email, subject = 'Website mes
   return rows?.[0] || null;
 };
 
-export { isSupabaseConfigured };
+export const submitFeedback = async ({ name, email, rating = 5, message }) => {
+  if (!isSupabaseConfigured) {
+    const localFeedback = JSON.parse(localStorage.getItem('medhalFeedback') || '[]');
+    localStorage.setItem('medhalFeedback', JSON.stringify([
+      ...localFeedback,
+      { name, email, rating, message, created_at: new Date().toISOString() },
+    ]));
+    return { local: true };
+  }
+
+  // Create feedback table if it doesn't exist
+  const rows = await request('/rest/v1/feedback', {
+    method: 'POST',
+    headers: { Prefer: 'return=representation' },
+    body: JSON.stringify({ name, email, rating, message }),
+  }).catch(() => {
+    // Fallback to localStorage if table doesn't exist
+    const localFeedback = JSON.parse(localStorage.getItem('medhalFeedback') || '[]');
+    localStorage.setItem('medhalFeedback', JSON.stringify([
+      ...localFeedback,
+      { name, email, rating, message, created_at: new Date().toISOString() },
+    ]));
+    return { local: true };
+  });
+  
+  return rows?.[0] || null;
+};
+
+export const getFeedback = async () => {
+  if (!isSupabaseConfigured) {
+    const localFeedback = JSON.parse(localStorage.getItem('medhalFeedback') || '[]');
+    return localFeedback;
+  }
+
+  try {
+    const feedback = await request('/rest/v1/feedback?order=created_at.desc');
+    return feedback || [];
+  } catch (error) {
+    console.error('Error fetching feedback:', error);
+    return [];
+  }
+};
+
+export const getContactMessages = async () => {
+  if (!isSupabaseConfigured) {
+    const localMessages = JSON.parse(localStorage.getItem('medhalContactMessages') || '[]');
+    return localMessages;
+  }
+
+  try {
+    const messages = await request('/rest/v1/contact_messages?order=created_at.desc');
+    return messages || [];
+  } catch (error) {
+    console.error('Error fetching contact messages:', error);
+    return [];
+  }
+};

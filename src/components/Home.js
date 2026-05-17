@@ -51,7 +51,7 @@ const HeroSection = styled.div`
   display: flex;
   align-items: center;
   justify-content: flex-start;
-  padding: 48px clamp(24px, 7vw, 80px);
+  padding: 48px clamp(24px, 7vw, 80px) 120px clamp(24px, 7vw, 80px);
   overflow: visible;
 
   &::before {
@@ -66,13 +66,13 @@ const HeroSection = styled.div`
   }
 
   @media (max-width: 1024px) {
-    padding: 36px clamp(24px, 6vw, 50px);
+    padding: 36px clamp(24px, 6vw, 50px) 100px clamp(24px, 6vw, 50px);
     min-height: 78vh;
   }
 
   @media (max-width: 768px) {
     min-height: 68vh;
-    padding: 36px 30px;
+    padding: 36px 30px 80px 30px;
     justify-content: center;
     text-align: center;
     background-attachment: scroll;
@@ -80,7 +80,7 @@ const HeroSection = styled.div`
 
   @media (max-width: 480px) {
     min-height: 60vh;
-    padding: 20px;
+    padding: 20px 20px 60px 20px;
   }
 `;
 
@@ -144,32 +144,29 @@ const SubHeading = styled.p`
 // ============ FEATURE CARDS SECTION ============
 
 const CardsWrapper = styled.div`
-  position: absolute;
-  top: 60%;
-  inset-inline: 0;
-  margin-inline: auto;
-  width: min(1000px, calc(100% - 160px));
-  padding: 0 clamp(24px, 6vw, 80px);
-  z-index: 10;
-  animation: ${slideUp} 1s ease-out 0.8s both;
+  position: relative;
+  width: 100%;
+  padding: var(--spacing-3xl) clamp(var(--spacing-md), 6vw, 80px);
+  background: transparent;
+  z-index: 5;
+  margin-top: -60px;
 
   @media (max-width: 1024px) {
-    width: min(1000px, calc(100% - 100px));
-    padding: 0 clamp(20px, 5vw, 50px);
-    top: 60%;
+    padding: var(--spacing-2xl) clamp(var(--spacing-md), 5vw, 50px);
+    margin-top: -40px;
   }
 
   @media (max-width: 768px) {
-    position: static;
+    position: relative;
     transform: none;
     width: 100%;
-    padding: 20px;
-    margin: 20px 0;
+    padding: var(--spacing-xl) var(--spacing-md);
+    margin-top: 0;
   }
 
   @media (max-width: 480px) {
-    padding: 15px;
-    margin: 15px 0;
+    padding: var(--spacing-lg) var(--spacing-sm);
+    margin-top: 0;
   }
 `;
 
@@ -179,6 +176,9 @@ const CardsContainer = styled.div`
   gap: 24px;
   width: 100%;
   margin-top: 0;
+  max-width: 1200px;
+  margin-left: auto;
+  margin-right: auto;
 
   @media (max-width: 1024px) {
     grid-template-columns: repeat(2, 1fr);
@@ -195,10 +195,10 @@ const CardBase = styled.div`
   padding: 32px;
   border-radius: 20px;
   backdrop-filter: blur(20px);
-  background: ${({ $bgColor }) => $bgColor || 'rgba(255, 255, 255, 0.1)'};
-  border: 1px solid rgba(255, 255, 255, 0.2);
-  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.15);
-  transition: all 0.4s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+  background: ${({ $bgColor }) => $bgColor || 'var(--medhal-navy)'};
+  border: 1px solid rgba(198, 167, 94, 0.3);
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.2);
+  transition: all var(--transition-base);
   cursor: pointer;
   animation: ${slideUp} 1s ease-out;
   animation-delay: ${({ $delay }) => $delay || '0s'};
@@ -208,9 +208,9 @@ const CardBase = styled.div`
 
   &:hover {
     transform: translateY(-12px);
-    background: ${({ $hoverBg }) => $hoverBg || 'rgba(255, 255, 255, 0.15)'};
-    box-shadow: 0 16px 48px rgba(0, 0, 0, 0.25);
-    border-color: rgba(255, 255, 255, 0.3);
+    background: ${({ $hoverBg }) => $hoverBg || 'rgba(15, 28, 46, 0.95)'};
+    box-shadow: 0 16px 48px rgba(0, 0, 0, 0.3);
+    border-color: rgba(198, 167, 94, 0.5);
   }
 
   @media (max-width: 768px) {
@@ -219,16 +219,16 @@ const CardBase = styled.div`
 `;
 
 const Card = styled(CardBase)`
-  background: #ffffff;
-  border-color: rgba(255, 255, 255, 0.5);
+  background: var(--medhal-navy);
+  border-color: rgba(198, 167, 94, 0.3);
   
   &:hover {
-    background: #ffffff;
+    background: rgba(15, 28, 46, 0.95);
   }
 `;
 
 const DarkCard = styled(CardBase)`
-  background: rgba(15, 28, 46, 0.85);
+  background: var(--medhal-navy);
   border-color: rgba(198, 167, 94, 0.3);
   
   &:hover {
@@ -246,7 +246,7 @@ const CardIcon = styled.div`
   transition: transform 0.3s ease;
   animation: ${parallaxFloat} 3s ease-in-out infinite;
   animation-delay: ${({ $delay }) => $delay || '0s'};
-  color: #0F1C2E;
+  color: var(--medhal-gold);
 
   ${CardBase}:hover & {
     transform: scale(1.2) rotate(5deg);
@@ -256,8 +256,8 @@ const CardIcon = styled.div`
 const CardTitle = styled.h3`
   font-size: 22px;
   font-weight: 700;
-  color: ${({ $textColor }) => $textColor || '#0F1C2E'};
-  font-family: 'Georgia', serif;
+  color: var(--medhal-gold);
+  font-family: var(--font-family-primary);
   margin: 16px 0 12px 0;
   letter-spacing: 1px;
 `;
@@ -265,9 +265,9 @@ const CardTitle = styled.h3`
 const CardDescription = styled.p`
   font-size: 15px;
   line-height: 1.6;
-  color: ${({ $textColor }) => $textColor || '#666666'};
+  color: #D9D9D9;
   margin: 0;
-  font-family: 'Georgia', serif;
+  font-family: var(--font-family-primary);
 `;
 
 const AboutHomeSection = styled.section`
@@ -275,7 +275,9 @@ const AboutHomeSection = styled.section`
   border-radius: 28px;
   box-shadow: 0 20px 50px rgba(15, 28, 46, 0.08);
   padding: 40px;
-  margin: 40px 0;
+  margin: var(--spacing-2xl) auto;
+  max-width: 1200px;
+  width: calc(100% - var(--spacing-xl));
   display: grid;
   grid-template-columns: minmax(260px, 320px) 1fr;
   gap: 32px;
@@ -284,14 +286,43 @@ const AboutHomeSection = styled.section`
   @media (max-width: 900px) {
     grid-template-columns: 1fr;
     text-align: center;
+    margin: var(--spacing-xl) var(--spacing-md);
+    width: auto;
+  }
+
+  @media (max-width: 768px) {
+    padding: var(--spacing-xl);
+    margin: var(--spacing-lg) var(--spacing-md);
+  }
+
+  @media (max-width: 480px) {
+    padding: var(--spacing-lg);
+    margin: var(--spacing-md) var(--spacing-sm);
+    gap: var(--spacing-lg);
   }
 `;
 
 const AboutLogo = styled.img`
   width: 140px;
-  height: auto;
+  height: 140px;
+  border-radius: 50%;
   margin: 0 auto;
   display: block;
+  object-fit: cover;
+  background: linear-gradient(135deg, var(--medhal-gold) 0%, #C6A75E 100%);
+  padding: 8px;
+  box-shadow: 0 8px 24px rgba(198, 167, 94, 0.3);
+  transition: all var(--transition-base);
+
+  @media (max-width: 768px) {
+    width: 120px;
+    height: 120px;
+  }
+
+  &:hover {
+    transform: scale(1.05);
+    box-shadow: 0 12px 36px rgba(198, 167, 94, 0.4);
+  }
 `;
 
 const AboutText = styled.div`
@@ -409,10 +440,10 @@ const Home = () => {
           {/* Card 1 - Explore The Sites */}
           <Card $delay="0.8s">
             <CardIcon $delay="0s"><AccountBalanceIcon sx={{ fontSize: 48 }} /></CardIcon>
-            <CardTitle $textColor="#0F1C2E">
+            <CardTitle>
               {isArabic ? 'المعالم السياحية والأثرية' : 'Tourist & Heritage Sites'}
             </CardTitle>
-            <CardDescription $textColor="#5A5A5A">
+            <CardDescription>
               {isArabic
                 ? 'اكتشف المواقع التاريخية والوجهات السياحية في المدن السعودية مع صور ووصف واضح'
                 : 'Discover historical sites and Saudi destinations with clear photos and descriptions'}
@@ -422,28 +453,28 @@ const Home = () => {
           {/* Card 2 - Local Experiences */}
           <Card $delay="1s">
             <CardIcon $delay="0.2s"><PublicIcon sx={{ fontSize: 48 }} /></CardIcon>
-            <CardTitle $textColor="#0F1C2E">
+            <CardTitle>
               {isArabic ? 'خرائط واتجاهات' : 'Maps & Directions'}
             </CardTitle>
-            <CardDescription $textColor="#5A5A5A">
+            <CardDescription>
               {isArabic
                 ? 'استخدم الخرائط التفاعلية وروابط الاتجاهات للوصول إلى الوجهات والخدمات بسهولة'
                 : 'Use interactive maps and direction links to reach destinations and services easily'}
             </CardDescription>
           </Card>
 
-          {/* Card 3 - Where to Stay (Dark Version) */}
-          <DarkCard $delay="1.2s">
-            <CardIcon $delay="0.4s"><HotelIcon sx={{ fontSize: 48, color: '#E5D4A8' }} /></CardIcon>
-            <CardTitle $textColor="#E5D4A8">
+          {/* Card 3 - Where to Stay (Same Blue Version) */}
+          <Card $delay="1.2s">
+            <CardIcon $delay="0.4s"><HotelIcon sx={{ fontSize: 48 }} /></CardIcon>
+            <CardTitle>
               {isArabic ? 'الخدمات التي يحتاجها الزائر' : 'Visitor Essential Services'}
             </CardTitle>
-            <CardDescription $textColor="#C9C9C9">
+            <CardDescription>
               {isArabic
                 ? 'اعثر على الفنادق والمطاعم والمستشفيات ومحطات الوقود والمراكز التجارية والمرافق العامة'
                 : 'Find hotels, restaurants, hospitals, fuel stations, malls, and public facilities'}
             </CardDescription>
-          </DarkCard>
+          </Card>
         </CardsContainer>
       </CardsWrapper>
 

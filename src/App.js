@@ -14,6 +14,7 @@ import ArchaeologicalPlacesPage from './components/ArchaeologicalPlacesPage';
 import AboutMedhal from './components/AboutMedhal';
 import Contact from './components/Contact';
 import ForgotPassword from './components/ForgotPassword';
+import Feedback from './components/Feedback';
 import Profile from './components/Profile';
 
 function App() {

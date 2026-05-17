@@ -9,8 +9,9 @@
   flex: 1;
   display: flex;
   flex-direction: column;
-  padding: var(--spacing-lg) var(--spacing-md);
-  gap: var(--spacing-lg);
+  padding: 0;
+  gap: 0;
+  width: 100%;
 }
 
 /* ===== Professional Spacing Reset ===== */
@@ -36,20 +37,21 @@ a {
 /* ===== Responsive Sections ===== */
 section {
   padding: var(--spacing-2xl) var(--spacing-md);
-  margin-bottom: var(--spacing-xl);
+  margin: 0;
+  width: 100%;
 }
 
 @media (max-width: 768px) {
   section {
     padding: var(--spacing-xl) var(--spacing-sm);
-    margin-bottom: var(--spacing-lg);
+    margin: 0;
   }
 }
 
 @media (max-width: 480px) {
   section {
     padding: var(--spacing-lg) var(--spacing-sm);
-    margin-bottom: var(--spacing-md);
+    margin: 0;
   }
 }
 
