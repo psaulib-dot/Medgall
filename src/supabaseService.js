@@ -340,3 +340,5 @@ export const getContactMessages = async () => {
     return [];
   }
 };
+
+export { isSupabaseConfigured };
