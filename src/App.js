@@ -1,5 +1,5 @@
 import React, { useEffect } from 'react';
-import { Route, Routes, useLocation } from 'react-router-dom';
+import { Route, Routes, useLocation, Outlet } from 'react-router-dom';
 import { ToastContainer } from 'react-toastify';
 import { useTranslation } from 'react-i18next';
 import 'react-toastify/dist/ReactToastify.css';
@@ -76,7 +76,7 @@ function App() {
 
             {/* User Routes */}
             <Route path="/visitor-dashboard" element={<PrivateRoute />}>
-              <Route path="/" element={<VisitorDashboard />}>
+              <Route element={<VisitorDashboard />}>
                 <Route index element={<Profile />} />
                 <Route path="profile" element={<Profile />} />
                 <Route path="favorites" element={<Favorites />} />
