@@ -1,5 +1,5 @@
 import React, { useEffect } from 'react';
-import { Route, Routes, useLocation, Outlet } from 'react-router-dom';
+import { Route, Routes, useLocation, Navigate } from 'react-router-dom';
 import { ToastContainer } from 'react-toastify';
 import { useTranslation } from 'react-i18next';
 import 'react-toastify/dist/ReactToastify.css';
@@ -77,7 +77,7 @@ function App() {
             {/* User Routes */}
             <Route path="/visitor-dashboard" element={<PrivateRoute />}>
               <Route element={<VisitorDashboard />}>
-                <Route index element={<Profile />} />
+                <Route index element={<Navigate to="profile" replace />} />
                 <Route path="profile" element={<Profile />} />
                 <Route path="favorites" element={<Favorites />} />
                 <Route path="feedback" element={<Feedback />} />
@@ -86,7 +86,7 @@ function App() {
             </Route>
 
             {/* Admin Routes */}
-            <Route path="/admin" element={<PrivateRoute><AdminDashboard /></PrivateRoute>} />
+            <Route path="/admin" element={<PrivateRoute component={AdminDashboard} />} />
           </Routes>
         </main>
         {showHeaderFooter && <Footer />}
