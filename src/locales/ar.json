@@ -7,7 +7,9 @@
     "contact": "اتصل بنا",
     "login": "دخول",
     "signup": "إنشاء حساب",
-    "logout": "تسجيل خروج"
+    "logout": "تسجيل خروج",
+    "profile": "ملفي الشخصي",
+    "admin": "لوحة التحكم"
   },
   "home": {
     "arabicTitle": "مدهال مرشدك السياحي الذكي",
@@ -25,7 +27,17 @@
       "message": "الرسالة",
       "submit": "إرسال الرسالة"
     },
-    "success": "تم إرسال الرسالة بنجاح!"
+    "submitting": "جارٍ الإرسال...",
+    "success": "تم إرسال الرسالة بنجاح! سنتصل بك قريباً.",
+    "error": {
+      "generic": "حدث خطأ. يرجى المحاولة مرة أخرى لاحقاً.",
+      "rls": "يجب تسجيل الدخول لإرسال رسالة."
+    },
+    "validation": {
+      "nameRequired": "الاسم مطلوب.",
+      "emailInvalid": "يرجى إدخال بريد إلكتروني صحيح.",
+      "messageRequired": "الرسالة لا يمكن أن تكون فارغة."
+    }
   },
   "footer": {
     "importantLinks": "روابط مهمة",
@@ -65,5 +77,51 @@
     "errorEmailRequired": "يرجى إدخال البريد الإلكتروني.",
     "failure": "فشل إرسال البريد الإلكتروني لإعادة التعيين.",
     "supabaseNotConfigured": "تتطلب إعادة تعيين كلمة المرور إعداد Supabase."
+  },
+  "admin": {
+    "dashboard": "لوحة التحكم",
+    "cities": "المدن",
+    "places": "الأماكن",
+    "users": "المستخدمون",
+    "feedback": "التقييمات",
+    "messages": "الرسائل",
+    "addCity": "إضافة مدينة",
+    "editCity": "تعديل مدينة",
+    "cityNameAr": "اسم المدينة (بالعربية)",
+    "cityNameEn": "اسم المدينة (بالإنجليزية)",
+    "addPlace": "إضافة مكان",
+    "editPlace": "تعديل مكان",
+    "placeNameAr": "اسم المكان (بالعربية)",
+    "placeNameEn": "اسم المكان (بالإنجليزية)",
+    "category": "الفئة",
+    "username": "اسم المستخدم",
+    "email": "البريد الإلكتروني",
+    "role": "الدور",
+    "visitor": "زائر",
+    "admin": "مسؤول",
+    "name": "الاسم",
+    "rating": "التقييم",
+    "message": "الرسالة",
+    "subject": "الموضوع",
+    "actions": "الإجراءات",
+    "edit": "تعديل",
+    "delete": "حذف",
+    "save": "حفظ",
+    "cancel": "إلغاء",
+    "confirmDelete": "هل أنت متأكد أنك تريد حذف هذا العنصر؟",
+    "citySaveSuccess": "تم حفظ المدينة بنجاح!",
+    "citySaveError": "حدث خطأ أثناء حفظ المدينة.",
+    "cityDeleteSuccess": "تم حذف المدينة بنجاح!",
+    "cityDeleteError": "حدث خطأ أثناء حذف المدينة.",
+    "placeSaveSuccess": "تم حفظ المكان بنجاح!",
+    "placeSaveError": "حدث خطأ أثناء حفظ المكان.",
+    "placeDeleteSuccess": "تم حذف المكان بنجاح!",
+    "placeDeleteError": "حدث خطأ أثناء حذف المكان.",
+    "userRoleUpdateSuccess": "تم تحديث دور المستخدم بنجاح!",
+    "userRoleUpdateError": "حدث خطأ أثناء تحديث دور المستخدم.",
+    "feedbackDeleteSuccess": "تم حذف التقييم بنجاح!",
+    "feedbackDeleteError": "حدث خطأ أثناء حذف التقييم.",
+    "messageDeleteSuccess": "تم حذف الرسالة بنجاح!",
+    "messageDeleteError": "حدث خطأ أثناء حذف الرسالة."
   }
 }

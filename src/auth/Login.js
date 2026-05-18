@@ -2,8 +2,9 @@ import React, { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import styled from 'styled-components';
 import { useTranslation } from 'react-i18next';
-import { useAuth } from '../hooks/useAuth'; // Import useAuth
-import { isSupabaseConfigured, signInUser } from '../supabaseService';
+import { useAuth } from '../hooks/useAuth';
+import { isSupabaseConfigured } from '../supabaseService';
+import { supabase } from '../utils/supabaseClient'; // Import supabase
 import { toastSuccess, toastError } from '../toast';
 import VisibilityIcon from '@mui/icons-material/Visibility';
 import VisibilityOffIcon from '@mui/icons-material/VisibilityOff';
@@ -206,7 +207,7 @@ const SignupLink = styled.div`
   }
 `;
 
-const Login = () => { // Remove onLogin from props
+const Login = () => {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [showPassword, setShowPassword] = useState(false);
@@ -214,7 +215,7 @@ const Login = () => { // Remove onLogin from props
   const navigate = useNavigate();
   const { t, i18n } = useTranslation();
   const isArabic = i18n.language === 'ar';
-  const { signIn } = useAuth(); // Use useAuth hook
+  const { signIn } = useAuth();
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -224,7 +225,7 @@ const Login = () => { // Remove onLogin from props
       let userRole = 'visitor'; // Default role
 
       if (isSupabaseConfigured) {
-        const { data, error } = await signIn({ email, password }); // Use signIn from useAuth
+        const { data, error } = await signIn({ email, password });
         if (error) throw error;
 
         const profile = await getProfile(data.user.id);

@@ -1,93 +1,54 @@
-
 import React from 'react';
-import { NavLink, Outlet } from 'react-router-dom';
-import styled from 'styled-components';
 import { useTranslation } from 'react-i18next';
-import { FaCity, FaMapMarkedAlt, FaList } from 'react-icons/fa';
+import { Box, Typography, Grid, Paper } from '@mui/material';
+import { styled } from '@mui/material/styles';
 
-const AdminDashboardContainer = styled.div`
-  display: flex;
-  min-height: calc(100vh - var(--header-height));
-  background-color: var(--medhal-background);
-`;
-
-const Sidebar = styled.div`
-  width: 250px;
-  background-color: var(--medhal-white);
-  box-shadow: 2px 0 5px rgba(0,0,0,0.05);
-  padding: var(--spacing-lg);
-  display: flex;
-  flex-direction: column;
-  
-  ${({ isArabic }) => isArabic && `
-    border-left: 1px solid var(--medhal-gold-light);
-    border-right: none;
-  `}
-  ${({ isArabic }) => !isArabic && `
-    border-right: 1px solid var(--medhal-gold-light);
-  `}
-`;
-
-const SidebarNav = styled.nav`
-  display: flex;
-  flex-direction: column;
-`;
-
-const StyledNavLink = styled(NavLink)`
-  color: var(--medhal-text-secondary);
-  text-decoration: none;
-  padding: var(--spacing-md);
-  margin-bottom: var(--spacing-sm);
-  border-radius: var(--radius-md);
-  display: flex;
-  align-items: center;
-  gap: var(--spacing-md);
-  font-weight: var(--font-weight-medium);
-  transition: all var(--transition-base);
-
-  &.active, &:hover {
-    background-color: var(--medhal-gold-lightest);
-    color: var(--medhal-gold-dark);
-    font-weight: var(--font-weight-bold);
-  }
-
-  svg {
-    font-size: 1.2rem;
-  }
-`;
-
-const Content = styled.main`
-  flex: 1;
-  padding: var(--spacing-xl);
-  background-color: #F7F4EE;
-`;
+const StatCard = styled(Paper)(({ theme }) => ({
+  padding: theme.spacing(3),
+  textAlign: 'center',
+  color: theme.palette.text.secondary,
+  height: '100%',
+}));
 
 const AdminDashboard = () => {
-  const { t, i18n } = useTranslation();
-  const isArabic = i18n.language === 'ar';
-
-  const adminNavs = [
-    { to: '/admin-dashboard/categories', icon: <FaList />, label: t('admin.nav.categories') || 'Categories' },
-    { to: '/admin-dashboard/cities', icon: <FaCity />, label: t('admin.nav.cities') || 'Cities' },
-    { to: '/admin-dashboard/places', icon: <FaMapMarkedAlt />, label: t('admin.nav.places') || 'Places' },
-  ];
+  const { t } = useTranslation('admin');
 
   return (
-    <AdminDashboardContainer>
-      <Sidebar isArabic={isArabic}>
-        <SidebarNav>
-          {adminNavs.map(nav => (
-            <StyledNavLink to={nav.to} key={nav.to}>
-              {nav.icon}
-              <span>{nav.label}</span>
-            </StyledNavLink>
-          ))}
-        </SidebarNav>
-      </Sidebar>
-      <Content>
-        <Outlet />
-      </Content>
-    </AdminDashboardContainer>
+    <Box sx={{ flexGrow: 1 }}>
+      <Typography variant="h4" component="h1" sx={{ mb: 4, fontWeight: 'bold' }}>
+        {t('dashboard.title')}
+      </Typography>
+      <Grid container spacing={3}>
+        <Grid item xs={12} sm={6} md={3}>
+          <StatCard>
+            <Typography variant="h5">123</Typography>
+            <Typography>{t('dashboard.totalPlaces')}</Typography>
+          </StatCard>
+        </Grid>
+        <Grid item xs={12} sm={6} md={3}>
+          <StatCard>
+            <Typography variant="h5">45</Typography>
+            <Typography>{t('dashboard.totalCities')}</Typography>
+          </StatCard>
+        </Grid>
+        <Grid item xs={12} sm={6} md={3}>
+          <StatCard>
+            <Typography variant="h5">89</Typography>
+            <Typography>{t('dashboard.totalUsers')}</Typography>
+          </StatCard>
+        </Grid>
+        <Grid item xs={12} sm={6} md={3}>
+          <StatCard>
+            <Typography variant="h5">5</Typography>
+            <Typography>{t('dashboard.newMessages')}</Typography>
+          </StatCard>
+        </Grid>
+      </Grid>
+      <Box sx={{ mt: 5 }}>
+        <Typography variant="h5" sx={{ mb: 2 }}>{t('dashboard.quickActions')}</Typography>
+        {/* Quick actions can be added here */}
+      </Box>
+    </Box>
   );
 };
 

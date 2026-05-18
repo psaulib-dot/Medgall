@@ -1,5 +1,5 @@
 import React, { useEffect, useMemo, useRef, useState } from 'react';
-import styled from 'styled-components';
+import styled, { css } from 'styled-components';
 import { useTranslation } from 'react-i18next';
 import { getTourismGuideData } from '../supabaseService';
 import InteractiveTourismMap from './InteractiveTourismMap';
@@ -26,11 +26,66 @@ const Container = styled.main`
   @media (min-width: 768px) {
     padding: 32px;
   }
+`;
 
-  @media (min-width: 1024px) {
-    padding: 42px;
+const PageLayout = styled.div`
+  display: flex;
+  flex-direction: row-reverse; /* Keep map on the left for LTR */
+  gap: 24px;
+  margin-top: 28px;
+  
+  ${({ dir }) => dir === 'rtl' && css`
+    flex-direction: row;
+  `}
+
+  @media (max-width: 1024px) {
+    flex-direction: column;
   }
 `;
+
+const Sidebar = styled.div`
+  width: 480px;
+  flex-shrink: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+
+  @media (max-width: 1024px) {
+    width: 100%;
+    order: 2; /* Show sidebar below map on mobile */
+  }
+`;
+
+const MainContent = styled.div`
+  flex-grow: 1;
+  position: sticky;
+  top: calc(var(--header-height) + 24px);
+  height: calc(100vh - var(--header-height) - 48px);
+
+  @media (max-width: 1024px) {
+    position: relative;
+    top: 0;
+    order: 1;
+    height: 65vh;
+    min-height: 450px;
+  }
+`;
+
+
+const SidebarSection = styled.div`
+  background: #fff;
+  border-radius: 22px;
+  padding: 20px;
+  box-shadow: 0 12px 28px rgba(15, 28, 46, 0.1);
+  border: 1px solid rgba(198, 167, 94, 0.22);
+`;
+
+const ScrollableContent = styled.div`
+  max-height: 70vh; /* Adjust as needed */
+  overflow-y: auto;
+  padding-right: 10px; /* For scrollbar spacing */
+`;
+
 
 const HeroPanel = styled.section`
   background: linear-gradient(135deg, #0F1C2E 0%, #17304d 100%);
@@ -74,17 +129,6 @@ const HeroText = styled.p`
   z-index: 1;
 `;
 
-const ControlsBar = styled.div`
-  display: grid;
-  grid-template-columns: minmax(220px, 1fr) auto;
-  gap: 14px;
-  margin: 0 0 28px;
-
-  @media (max-width: 768px) {
-    grid-template-columns: 1fr;
-  }
-`;
-
 const SearchInput = styled.input`
   border: 2px solid rgba(15, 28, 46, 0.12);
   border-radius: 16px;
@@ -93,6 +137,8 @@ const SearchInput = styled.input`
   background: #fff;
   color: #0F1C2E;
   outline: none;
+  width: 100%;
+  margin-bottom: 14px;
 
   &:focus {
     border-color: #C6A75E;
@@ -110,10 +156,11 @@ const LocationButton = styled.button`
   font-weight: 700;
   cursor: pointer;
   transition: all 0.25s ease;
-  display: inline-flex;
+  display: flex;
   align-items: center;
   gap: 8px;
   justify-content: center;
+  width: 100%;
 
   &:hover {
     transform: translateY(-2px);
@@ -121,34 +168,30 @@ const LocationButton = styled.button`
   }
 `;
 
-const Section = styled.section`
-  margin-bottom: 42px;
-`;
-
 const SectionTitle = styled.h2`
   color: #0F1C2E;
-  font-size: clamp(26px, 3vw, 42px);
+  font-size: clamp(22px, 3vw, 32px);
   font-weight: bold;
-  margin: 0 0 22px;
+  margin: 0 0 18px;
   text-align: center;
 
   span {
     border-bottom: 4px solid #C6A75E;
-    padding-bottom: 10px;
+    padding-bottom: 8px;
   }
 `;
 
 const CitiesGrid = styled.div`
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(230px, 1fr));
-  gap: 24px;
+  grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+  gap: 18px;
 `;
 
 const CityCard = styled.button`
   background-color: #fff;
-  border-radius: 22px;
+  border-radius: 18px;
   border: 3px solid ${({ $selected }) => ($selected ? '#C6A75E' : 'transparent')};
-  box-shadow: 0 12px 28px rgba(15, 28, 46, 0.12);
+  box-shadow: 0 8px 20px rgba(15, 28, 46, 0.1);
   overflow: hidden;
   cursor: pointer;
   transition: all 0.28s ease;
@@ -156,36 +199,25 @@ const CityCard = styled.button`
   text-align: inherit;
 
   &:hover {
-    transform: translateY(-8px);
-    box-shadow: 0 18px 36px rgba(15, 28, 46, 0.18);
+    transform: translateY(-6px);
+    box-shadow: 0 14px 30px rgba(15, 28, 46, 0.15);
   }
 `;
 
 const CityImage = styled.img`
   width: 100%;
-  height: 185px;
+  height: 120px;
   object-fit: cover;
   display: block;
 `;
 
 const CityTitle = styled.h3`
-  padding: 16px;
+  padding: 14px;
   margin: 0;
   color: #0F1C2E;
-  font-size: 23px;
+  font-size: 19px;
   text-align: center;
   background-color: #fff;
-`;
-
-const Dashboard = styled.div`
-  display: grid;
-  grid-template-columns: 1.1fr 0.9fr;
-  gap: 24px;
-  align-items: stretch;
-
-  @media (max-width: 980px) {
-    grid-template-columns: 1fr;
-  }
 `;
 
 const MapPanel = styled.div`
@@ -194,40 +226,22 @@ const MapPanel = styled.div`
   padding: 18px;
   box-shadow: 0 12px 28px rgba(15, 28, 46, 0.1);
   border: 1px solid rgba(198, 167, 94, 0.22);
-`;
-
-const GuidePanel = styled.div`
-  background: #0F1C2E;
-  color: #fff;
-  border-radius: 22px;
-  padding: 24px 24px 48px;
-  box-shadow: 0 12px 28px rgba(15, 28, 46, 0.18);
-`;
-
-const GuideTitle = styled.h3`
-  color: #E5D4A8;
-  font-size: 26px;
-  margin: 0 0 12px;
-`;
-
-const GuideList = styled.ul`
-  margin: 0;
-  padding-inline-start: 22px;
-  line-height: 2;
-  color: #f5f0e5;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
 `;
 
 const TabsContainer = styled.div`
   display: flex;
   justify-content: center;
-  gap: 12px;
-  margin: 28px 0;
+  gap: 10px;
+  margin-bottom: 20px;
   flex-wrap: wrap;
 `;
 
 const Tab = styled.button`
-  padding: 12px 22px;
-  font-size: 17px;
+  padding: 10px 18px;
+  font-size: 15px;
   font-weight: bold;
   background-color: ${({ $active }) => ($active ? '#0F1C2E' : '#fff')};
   color: ${({ $active }) => ($active ? '#E5D4A8' : '#0F1C2E')};
@@ -238,38 +252,42 @@ const Tab = styled.button`
   display: inline-flex;
   align-items: center;
   justify-content: center;
+  gap: 6px;
 
   &:hover {
     background-color: #0F1C2E;
     color: #E5D4A8;
   }
+  
+  svg {
+    font-size: 18px;
+  }
 `;
 
 const ContentGrid = styled.div`
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(270px, 1fr));
-  gap: 24px;
+  grid-template-columns: 1fr;
+  gap: 20px;
 `;
 
 const Card = styled.article`
   background-color: #fff;
   border-radius: 20px;
-  box-shadow: 0 12px 28px rgba(15, 28, 46, 0.1);
+  box-shadow: 0 10px 25px rgba(15, 28, 46, 0.08);
   overflow: hidden;
   transition: transform 0.25s ease, box-shadow 0.25s ease;
   display: flex;
   flex-direction: column;
-  min-height: 100%;
 
   &:hover {
-    transform: translateY(-6px);
-    box-shadow: 0 18px 38px rgba(15, 28, 46, 0.16);
+    transform: translateY(-4px);
+    box-shadow: 0 16px 35px rgba(15, 28, 46, 0.12);
   }
 `;
 
 const CardImage = styled.img`
   width: 100%;
-  height: 230px;
+  height: 200px;
   object-fit: cover;
 `;
 
@@ -277,17 +295,17 @@ const ServiceIcon = styled.div`
   height: 120px;
   display: grid;
   place-items: center;
-  font-size: 58px;
+  font-size: 52px;
   background: linear-gradient(135deg, #f6f1e6, #ffffff);
   color: #0F1C2E;
   
   svg {
-    font-size: 58px;
+    font-size: 52px;
   }
 `;
 
 const CardContent = styled.div`
-  padding: 20px;
+  padding: 18px;
   flex: 1;
   display: flex;
   flex-direction: column;
@@ -295,26 +313,24 @@ const CardContent = styled.div`
 
 const CardTitle = styled.h4`
   color: #0F1C2E;
-  font-size: 21px;
+  font-size: 20px;
   margin: 0 0 10px;
   font-weight: bold;
-  text-align: center;
-  line-height: 1.45;
+  line-height: 1.4;
 `;
 
 const CardDescription = styled.p`
   color: #5A5A5A;
-  font-size: 15.5px;
-  line-height: 1.8;
-  margin: 0 0 14px;
-  text-align: justify;
+  font-size: 15px;
+  line-height: 1.7;
+  margin: 0 0 12px;
 `;
 
 const InfoItem = styled.div`
   color: #0F1C2E;
-  font-size: 14.5px;
-  margin-top: 8px;
-  line-height: 1.6;
+  font-size: 14px;
+  margin-top: 6px;
+  line-height: 1.5;
 `;
 
 const Actions = styled.div`
@@ -322,11 +338,7 @@ const Actions = styled.div`
   grid-template-columns: 1fr 1fr;
   gap: 10px;
   margin-top: auto;
-  padding-top: 16px;
-
-  @media (max-width: 420px) {
-    grid-template-columns: 1fr;
-  }
+  padding-top: 14px;
 `;
 
 const ActionLink = styled.a`
@@ -348,8 +360,8 @@ const ActionLink = styled.a`
 const EmptyState = styled.div`
   text-align: center;
   color: #0F1C2E;
-  font-size: 19px;
-  padding: 44px;
+  font-size: 18px;
+  padding: 40px;
   background-color: #fff;
   border-radius: 20px;
   box-shadow: 0 12px 28px rgba(15, 28, 46, 0.08);
@@ -394,20 +406,27 @@ const MapFilterButton = styled.button`
   font-weight: 700;
   cursor: pointer;
   transition: all 0.2s ease;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
 
   &:hover {
     transform: translateY(-1px);
     border-color: #C6A75E;
   }
+  svg {
+    font-size: 16px;
+  }
 `;
+
 
 const MapLegend = styled.div`
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(155px, 1fr));
+  grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
   gap: 8px;
   margin-top: 12px;
   color: #0F1C2E;
-  font-size: 13.5px;
+  font-size: 13px;
 `;
 
 const LegendItem = styled.span`
@@ -416,6 +435,14 @@ const LegendItem = styled.span`
   border-radius: 999px;
   padding: 8px 10px;
   text-align: center;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 4px;
+
+  svg {
+    font-size: 16px;
+  }
 `;
 
 const getText = (item, lang, field, fallback = '') => item?.[lang]?.[field] || fallback;
@@ -426,7 +453,7 @@ const CATEGORY_META = {
   hotels: { icon: HotelIcon, ar: 'الفنادق', en: 'Hotels' },
   restaurants: { icon: RestaurantIcon, ar: 'المطاعم', en: 'Restaurants' },
   entertainment: { icon: AttractionsIcon, ar: 'الترفيه', en: 'Entertainment' },
-  publicServices: { icon: LocalHospitalIcon, ar: 'الخدمات العامة', en: 'Public Services' },
+  publicServices: { icon: LocalHospitalIcon, ar: 'الخدمات', en: 'Services' },
 };
 
 const getCategoryText = (category, isArabic) => {
@@ -438,10 +465,10 @@ const getCategoryLabel = (category, isArabic) => {
   const meta = CATEGORY_META[category] || CATEGORY_META.all;
   const Icon = meta.icon;
   return (
-    <span style={{ display: 'inline-flex', alignItems: 'center', gap: '6px' }}>
-      <Icon sx={{ fontSize: 18 }} />
+    <>
+      <Icon />
       {getCategoryText(category, isArabic)}
-    </span>
+    </>
   );
 };
 
@@ -501,7 +528,7 @@ const ArchaeologicalPlacesPage = () => {
   const [locationMessage, setLocationMessage] = useState('');
   const [citiesDataBilingual, setCitiesDataBilingual] = useState({});
   const [tourismEnhancements, setTourismEnhancements] = useState({});
-  const attractionsRef = useRef(null);
+  const contentRef = useRef(null);
   const { i18n } = useTranslation();
   const lang = i18n.language === 'en' ? 'en' : 'ar';
   const isArabic = lang === 'ar';
@@ -520,22 +547,13 @@ const ArchaeologicalPlacesPage = () => {
 
   const cityKeys = useMemo(() => Object.keys(citiesDataBilingual), [citiesDataBilingual]);
 
-  const filteredCities = useMemo(() => {
-    const term = searchTerm.trim().toLowerCase();
-    if (!term) return cityKeys;
-    return cityKeys.filter((cityKey) => {
-      const city = citiesDataBilingual[cityKey];
-      return city.ar.name.includes(searchTerm.trim()) || city.en.name.toLowerCase().includes(term);
-    });
-  }, [cityKeys, searchTerm, citiesDataBilingual]);
-
   const handleCityClick = (cityName) => {
     setSelectedCity(cityName);
     setActiveTab('attractions');
     setMapFilter('all');
 
     setTimeout(() => {
-      attractionsRef.current?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+      contentRef.current?.scrollIntoView({ behavior: 'smooth', block: 'start' });
     }, 120);
   };
 
@@ -566,126 +584,144 @@ const ArchaeologicalPlacesPage = () => {
   const buildCategoryItems = (category) => {
     if (!selectedCityData) return [];
 
+    // ... (rest of the buildCategoryItems function is the same)
+
     if (category === 'attractions') {
-      return selectedCityData.attractions.items.map((item, index) => ({
-        category,
-        markerIcon: <AccountBalanceIcon />,
-        kind: 'image',
-        image: item.image,
-        title: getText(item, lang, 'title'),
-        description: getText(item, lang, 'description'),
-        address: getText(item, lang, 'address', selectedCityData[lang].name) || selectedCityData[lang].name,
-        type: isArabic ? 'معلم سياحي / أثري' : 'Tourist / Archaeological Site',
-        phone: getText(item, lang, 'phone', isArabic ? 'غير متوفر' : 'Not available'),
-        coords: item.coords || offsetCoordinate(cityCenter, index, category),
-      }));
-    }
+        return selectedCityData.attractions.items.map((item, index) => ({
+          category,
+          markerIcon: <AccountBalanceIcon />,
+          kind: 'image',
+          image: item.image,
+          title: getText(item, lang, 'title'),
+          description: getText(item, lang, 'description'),
+          address: getText(item, lang, 'address', selectedCityData[lang].name) || selectedCityData[lang].name,
+          type: isArabic ? 'معلم سياحي / أثري' : 'Tourist / Archaeological Site',
+          phone: getText(item, lang, 'phone', isArabic ? 'غير متوفر' : 'Not available'),
+          coords: item.coords || offsetCoordinate(cityCenter, index, category),
+        }));
+      }
+  
+      if (category === 'hotels') {
+        return selectedCityData.hotels.map((item, index) => ({
+          category,
+          markerIcon: <HotelIcon />,
+          kind: 'image',
+          image: item.image,
+          title: getText(item, lang, 'name'),
+          description: getText(item, lang, 'description'),
+          address: getText(item, lang, 'address'),
+          type: isArabic ? 'فندق' : 'Hotel',
+          phone: getText(item, lang, 'phone'),
+          extra: `⭐ ${item.rating}`,
+          coords: item.coords || offsetCoordinate(cityCenter, index, category),
+        }));
+      }
+  
+      if (category === 'restaurants') {
+        return selectedCityData.restaurants.map((item, index) => ({
+          category,
+          markerIcon: <RestaurantIcon />,
+          kind: 'image',
+          image: item.image,
+          title: getText(item, lang, 'name'),
+          description: getText(item, lang, 'description'),
+          address: getText(item, lang, 'address'),
+          type: getText(item, lang, 'cuisine'),
+          phone: getText(item, lang, 'phone'),
+          extra: `🕐 ${getText(item, lang, 'hours')}`,
+          coords: item.coords || offsetCoordinate(cityCenter, index, category),
+        }));
+      }
+  
+      if (category === 'entertainment') {
+        return (selectedCityData.entertainment || []).map((item, index) => ({
+          category,
+          markerIcon: <AttractionsIcon />,
+          kind: 'image',
+          image: item.image,
+          title: getText(item, lang, 'name'),
+          description: getText(item, lang, 'description'),
+          address: getText(item, lang, 'address'),
+          type: getText(item, lang, 'type'),
+          phone: getText(item, lang, 'phone'),
+          extra: `🕐 ${getText(item, lang, 'hours')}`,
+          coords: item.coords || offsetCoordinate(cityCenter, index, category),
+        }));
+      }
+  
+      if (category === 'publicServices') {
+        const getServiceIcon = (serviceType) => {
+          const type = serviceType?.toLowerCase() || '';
+          if (type.includes('hospital') || type.includes('مستشفى')) return <LocalHospitalIcon />;
+          if (type.includes('fuel') || type.includes('وقود') || type.includes('gas')) return <LocalGasStationIcon />;
+          if (type.includes('mall') || type.includes('مركز') || type.includes('shopping')) return <ShoppingCartIcon />;
+          if (type.includes('restroom') || type.includes('دورة') || type.includes('wc')) return <WcIcon />;
+          return <LocalHospitalIcon />;
+        };
+  
+        return (enhancement?.publicServices || []).map((item, index) => ({
+          category,
+          markerIcon: getServiceIcon(getText(item, lang, 'type')),
+          kind: 'service',
+          icon: getServiceIcon(getText(item, lang, 'type')),
+          title: getText(item, lang, 'name'),
+          description: getText(item, lang, 'description'),
+          address: getText(item, lang, 'address'),
+          type: getText(item, lang, 'type'),
+          phone: getText(item, lang, 'phone'),
+          extra: `🕐 ${getText(item, lang, 'hours')}`,
+          coords: item.coords || offsetCoordinate(cityCenter, index, category),
+        }));
+      }
+  
+      return [];
 
-    if (category === 'hotels') {
-      return selectedCityData.hotels.map((item, index) => ({
-        category,
-        markerIcon: <HotelIcon />,
-        kind: 'image',
-        image: item.image,
-        title: getText(item, lang, 'name'),
-        description: getText(item, lang, 'description'),
-        address: getText(item, lang, 'address'),
-        type: isArabic ? 'فندق' : 'Hotel',
-        phone: getText(item, lang, 'phone'),
-        extra: `⭐ ${item.rating}`,
-        coords: item.coords || offsetCoordinate(cityCenter, index, category),
-      }));
-    }
-
-    if (category === 'restaurants') {
-      return selectedCityData.restaurants.map((item, index) => ({
-        category,
-        markerIcon: <RestaurantIcon />,
-        kind: 'image',
-        image: item.image,
-        title: getText(item, lang, 'name'),
-        description: getText(item, lang, 'description'),
-        address: getText(item, lang, 'address'),
-        type: getText(item, lang, 'cuisine'),
-        phone: getText(item, lang, 'phone'),
-        extra: `🕐 ${getText(item, lang, 'hours')}`,
-        coords: item.coords || offsetCoordinate(cityCenter, index, category),
-      }));
-    }
-
-    if (category === 'entertainment') {
-      return (selectedCityData.entertainment || []).map((item, index) => ({
-        category,
-        markerIcon: <AttractionsIcon />,
-        kind: 'image',
-        image: item.image,
-        title: getText(item, lang, 'name'),
-        description: getText(item, lang, 'description'),
-        address: getText(item, lang, 'address'),
-        type: getText(item, lang, 'type'),
-        phone: getText(item, lang, 'phone'),
-        extra: `🕐 ${getText(item, lang, 'hours')}`,
-        coords: item.coords || offsetCoordinate(cityCenter, index, category),
-      }));
-    }
-
-    if (category === 'publicServices') {
-      const getServiceIcon = (serviceType) => {
-        const type = serviceType?.toLowerCase() || '';
-        if (type.includes('hospital') || type.includes('مستشفى')) return <LocalHospitalIcon />;
-        if (type.includes('fuel') || type.includes('وقود') || type.includes('gas')) return <LocalGasStationIcon />;
-        if (type.includes('mall') || type.includes('مركز') || type.includes('shopping')) return <ShoppingCartIcon />;
-        if (type.includes('restroom') || type.includes('دورة') || type.includes('wc')) return <WcIcon />;
-        return <LocalHospitalIcon />;
-      };
-
-      return (enhancement?.publicServices || []).map((item, index) => ({
-        category,
-        markerIcon: getServiceIcon(getText(item, lang, 'type')),
-        kind: 'service',
-        icon: getServiceIcon(getText(item, lang, 'type')),
-        title: getText(item, lang, 'name'),
-        description: getText(item, lang, 'description'),
-        address: getText(item, lang, 'address'),
-        type: getText(item, lang, 'type'),
-        phone: getText(item, lang, 'phone'),
-        extra: `🕐 ${getText(item, lang, 'hours')}`,
-        coords: item.coords || offsetCoordinate(cityCenter, index, category),
-      }));
-    }
-
-    return [];
   };
 
-  const buildItems = () => buildCategoryItems(activeTab);
-
-  const allMapItems = ['attractions', 'hotels', 'restaurants', 'entertainment', 'publicServices']
-    .flatMap((category) => buildCategoryItems(category))
-    .filter((item) => item.coords?.lat && item.coords?.lng);
-
-
-  const items = buildItems().filter((item) => {
+  const filteredCityKeys = useMemo(() => {
     const term = searchTerm.trim().toLowerCase();
-    if (!term || !selectedCity) return true;
-    return [item.title, item.description, item.address, item.type]
-      .join(' ')
-      .toLowerCase()
-      .includes(term) || [item.title, item.description, item.address, item.type].join(' ').includes(searchTerm.trim());
-  });
+    if (!term) return cityKeys;
+    return cityKeys.filter((cityKey) => {
+      const city = citiesDataBilingual[cityKey];
+      return city.ar.name.includes(searchTerm.trim()) || city.en.name.toLowerCase().includes(term);
+    });
+  }, [cityKeys, searchTerm, citiesDataBilingual]);
 
-  const mapItems = allMapItems
-    .filter((item) => mapFilter === 'all' || item.category === mapFilter)
-    .map((item) => {
-      const km = distanceKm(userLocation, item.coords);
-      return {
+
+  const items = useMemo(() => {
+    if (!selectedCity) return [];
+    const term = searchTerm.trim().toLowerCase();
+    const categoryItems = buildCategoryItems(activeTab);
+    
+    if (!term) return categoryItems;
+
+    return categoryItems.filter(item => 
+      [item.title, item.description, item.address, item.type]
+        .join(' ').toLowerCase().includes(term) ||
+        [item.title, item.description, item.address, item.type]
+        .join(' ').includes(searchTerm.trim())
+    );
+  }, [selectedCity, activeTab, searchTerm, citiesDataBilingual, enhancement, lang]);
+
+  const allMapItems = useMemo(() => 
+    ['attractions', 'hotels', 'restaurants', 'entertainment', 'publicServices']
+      .flatMap(buildCategoryItems)
+      .filter(item => item.coords?.lat && item.coords?.lng),
+    [selectedCity, citiesDataBilingual, enhancement, lang]
+  );
+
+  const mapItems = useMemo(() => 
+    allMapItems
+      .filter(item => mapFilter === 'all' || item.category === mapFilter)
+      .map(item => ({
         ...item,
         categoryLabel: getCategoryText(item.category, isArabic),
-        distanceText: formatDistance(km, isArabic),
-      };
-    });
+        distanceText: formatDistance(distanceKm(userLocation, item.coords), isArabic),
+      })),
+    [allMapItems, mapFilter, userLocation, isArabic]
+  );
 
   const cityName = selectedCityData?.[lang]?.name;
-  const mapQuery = selectedCity ? `${cityName} Saudi Arabia tourist map` : 'Saudi Arabia tourism map';
 
   return (
     <Container dir={isArabic ? 'rtl' : 'ltr'}>
@@ -693,172 +729,127 @@ const ArchaeologicalPlacesPage = () => {
         <HeroTitle>{isArabic ? 'مرشد سياحي ذكي داخل المملكة' : 'Smart Tourism Guide in Saudi Arabia'}</HeroTitle>
         <HeroText>
           {isArabic
-            ? 'يقدم النظام تجربة سياحية متكاملة تدعم العربية والإنجليزية، وتجمع بين المدن السياحية، المعالم الأثرية، الخرائط التفاعلية، الفنادق، المطاعم، أماكن الترفيه، والخدمات العامة التي يحتاجها الزائر أثناء رحلته.'
-            : 'The system provides an integrated bilingual tourism experience that combines tourist cities, archaeological sites, interactive maps, hotels, restaurants, entertainment places, and public services needed during the visitor journey.'}
+            ? 'اختر مدينة واستكشف معالمها السياحية، الفنادق، المطاعم، وأماكن الترفيه والخدمات العامة من خلال الخريطة التفاعلية والقوائم التفصيلية.'
+            : 'Select a city and explore its landmarks, hotels, restaurants, entertainment, and public services through our interactive map and detailed lists.'}
         </HeroText>
       </HeroPanel>
 
-      <ControlsBar>
-        <SearchInput
-          value={searchTerm}
-          onChange={(event) => setSearchTerm(event.target.value)}
-          placeholder={isArabic ? 'ابحث عن مدينة، معلم، فندق، مطعم أو خدمة عامة...' : 'Search for a city, landmark, hotel, restaurant, or public service...'}
-        />
-        <LocationButton onClick={handleDetectLocation}>
-          <MyLocationIcon sx={{ fontSize: 20 }} />
-          {isArabic ? 'استخدام موقعي للاتجاهات' : 'Use My Location for Directions'}
-        </LocationButton>
-      </ControlsBar>
-      {locationMessage && <StatusNote>{locationMessage}</StatusNote>}
+      <PageLayout dir={isArabic ? 'rtl' : 'ltr'}>
+        <MainContent>
+          <MapPanel>
+            <MapHeader>
+              <MapTitle>{cityName ? `${isArabic ? 'خريطة' : 'Map of'} ${cityName}` : (isArabic ? 'خريطة المملكة' : 'Map of Saudi Arabia')}</MapTitle>
+              {selectedCity && (
+                <MapFilterBar>
+                  {Object.keys(CATEGORY_META).map((category) => (
+                    <MapFilterButton
+                      key={category}
+                      $active={mapFilter === category}
+                      onClick={() => setMapFilter(category)}
+                    >
+                      {getCategoryLabel(category, isArabic)}
+                    </MapFilterButton>
+                  ))}
+                </MapFilterBar>
+              )}
+            </MapHeader>
+            <InteractiveTourismMap
+              center={cityCenter}
+              markers={mapItems}
+              userLocation={userLocation}
+              isArabic={isArabic}
+              cityName={cityName}
+            />
+            <MapLegend>
+              <LegendItem><LocationCityIcon /> {isArabic ? 'مركز المدينة' : 'City Center'}</LegendItem>
+              <LegendItem><LocationOnIcon /> {isArabic ? 'الأماكن' : 'Places'}</LegendItem>
+              <LegendItem><MyLocationIcon /> {isArabic ? 'موقعك' : 'Your Location'}</LegendItem>
+            </MapLegend>
+          </MapPanel>
+        </MainContent>
 
-      <Section>
-        <SectionTitle><span>{isArabic ? 'اختر المدينة' : 'Select a City'}</span></SectionTitle>
-        <CitiesGrid>
-          {filteredCities.map((city) => (
-            <CityCard
-              key={city}
-              onClick={() => handleCityClick(city)}
-              $selected={selectedCity === city}
-            >
-              <CityImage src={citiesDataBilingual[city].mainImage} alt={citiesDataBilingual[city][lang].name} />
-              <CityTitle>{citiesDataBilingual[city][lang].name}</CityTitle>
-            </CityCard>
-          ))}
-        </CitiesGrid>
-      </Section>
+        <Sidebar>
+          <SidebarSection>
+             <SearchInput
+              value={searchTerm}
+              onChange={(event) => setSearchTerm(event.target.value)}
+              placeholder={isArabic ? 'ابحث عن مدينة، معلم، فندق...' : 'Search city, landmark, hotel...'}
+            />
+            <LocationButton onClick={handleDetectLocation}>
+              <MyLocationIcon />
+              {isArabic ? 'استخدام موقعي للاتجاهات' : 'Use My Location for Directions'}
+            </LocationButton>
+            {locationMessage && <StatusNote>{locationMessage}</StatusNote>}
+          </SidebarSection>
+          
+          <SidebarSection>
+            <SectionTitle><span>{isArabic ? 'اختر المدينة' : 'Select a City'}</span></SectionTitle>
+            <CitiesGrid>
+              {filteredCityKeys.map((city) => (
+                <CityCard
+                  key={city}
+                  onClick={() => handleCityClick(city)}
+                  $selected={selectedCity === city}
+                >
+                  <CityImage src={citiesDataBilingual[city].mainImage} alt={citiesDataBilingual[city][lang].name} />
+                  <CityTitle>{citiesDataBilingual[city][lang].name}</CityTitle>
+                </CityCard>
+              ))}
+            </CitiesGrid>
+          </SidebarSection>
 
-      <Section ref={attractionsRef}>
-        <SectionTitle>
-          <span>{selectedCity ? cityName : (isArabic ? 'تفاصيل المرشد السياحي' : 'Tourism Guide Details')}</span>
-        </SectionTitle>
-
-        {selectedCity ? (
-          <>
-            <Dashboard>
-              <MapPanel>
-                <MapHeader>
-                  <MapTitle>{isArabic ? 'خريطة Google مدمجة للمدينة' : 'Embedded Google City Map'}</MapTitle>
-                  <MapFilterBar>
-                    {Object.keys(CATEGORY_META).map((category) => (
-                      <MapFilterButton
-                        key={category}
-                        $active={mapFilter === category}
-                        onClick={() => setMapFilter(category)}
-                      >
-                        {getCategoryLabel(category, isArabic)}
-                      </MapFilterButton>
-                    ))}
-                  </MapFilterBar>
-                </MapHeader>
-                <InteractiveTourismMap
-                  center={cityCenter}
-                  markers={mapItems}
-                  userLocation={userLocation}
-                  isArabic={isArabic}
-                  cityName={cityName}
-                />
-                <MapLegend>
-                  <LegendItem>
-                    <LocationCityIcon sx={{ fontSize: 16, marginInlineEnd: '4px', verticalAlign: 'middle' }} />
-                    {isArabic ? 'مركز المدينة' : 'City Center'}
-                  </LegendItem>
-                  <LegendItem>
-                    <LocationOnIcon sx={{ fontSize: 16, marginInlineEnd: '4px', verticalAlign: 'middle' }} />
-                    {isArabic ? 'قائمة الأماكن والخدمات' : 'Places and services list'}
-                  </LegendItem>
-                  <LegendItem>
-                    <MyLocationIcon sx={{ fontSize: 16, marginInlineEnd: '4px', verticalAlign: 'middle' }} />
-                    {isArabic ? 'موقع المستخدم' : 'User location'}
-                  </LegendItem>
-                </MapLegend>
-                <Actions>
-                  <ActionLink $primary href={makeMapSearchUrl(mapQuery)} target="_blank" rel="noreferrer">
-                    {isArabic ? 'فتح في Google Maps' : 'Open in Google Maps'}
-                  </ActionLink>
-                  <ActionLink href={makeDirectionsUrl(cityCenter || `${cityName}, Saudi Arabia`, userLocation)} target="_blank" rel="noreferrer">
-                    {isArabic ? 'الاتجاهات للمدينة' : 'Directions to City'}
-                  </ActionLink>
-                </Actions>
-              </MapPanel>
-
-              <GuidePanel>
-                <GuideTitle>{isArabic ? 'ماذا يوفر النظام للزائر؟' : 'What does the system provide?'}</GuideTitle>
-                <GuideList>
-                  <li>{isArabic ? 'عرض المعالم السياحية والأثرية مع الوصف والصور.' : 'Displays tourist and archaeological sites with descriptions and images.'}</li>
-                  <li>{isArabic ? 'إرشاد المستخدم عبر خرائط وروابط اتجاهات مباشرة.' : 'Guides visitors through maps and direct direction links.'}</li>
-                  <li>{isArabic ? 'توفير الفنادق والمطاعم وأماكن الترفيه حسب المدينة.' : 'Provides hotels, restaurants, and entertainment places by city.'}</li>
-                  <li>{isArabic ? 'عرض الخدمات العامة المهمة مثل المستشفيات، محطات الوقود، المراكز التجارية، ودورات المياه.' : 'Shows key public services such as hospitals, fuel stations, malls, and restrooms.'}</li>
-                  <li>{isArabic ? 'بحث وتصنيف سريع لتسهيل التخطيط للرحلة.' : 'Fast search and categories to simplify trip planning.'}</li>
-                </GuideList>
-              </GuidePanel>
-            </Dashboard>
-
-            <TabsContainer>
-              <Tab $active={activeTab === 'attractions'} onClick={() => setActiveTab('attractions')}>
-                <AccountBalanceIcon sx={{ fontSize: 18, marginInlineEnd: '6px' }} />
-                {isArabic ? 'المعالم' : 'Attractions'}
-              </Tab>
-              <Tab $active={activeTab === 'hotels'} onClick={() => setActiveTab('hotels')}>
-                <HotelIcon sx={{ fontSize: 18, marginInlineEnd: '6px' }} />
-                {isArabic ? 'الفنادق' : 'Hotels'}
-              </Tab>
-              <Tab $active={activeTab === 'restaurants'} onClick={() => setActiveTab('restaurants')}>
-                <RestaurantIcon sx={{ fontSize: 18, marginInlineEnd: '6px' }} />
-                {isArabic ? 'المطاعم' : 'Restaurants'}
-              </Tab>
-              <Tab $active={activeTab === 'entertainment'} onClick={() => setActiveTab('entertainment')}>
-                <AttractionsIcon sx={{ fontSize: 18, marginInlineEnd: '6px' }} />
-                {isArabic ? 'الترفيه' : 'Entertainment'}
-              </Tab>
-              <Tab $active={activeTab === 'publicServices'} onClick={() => setActiveTab('publicServices')}>
-                <LocalHospitalIcon sx={{ fontSize: 18, marginInlineEnd: '6px' }} />
-                {isArabic ? 'الخدمات العامة' : 'Public Services'}
-              </Tab>
-            </TabsContainer>
-
-            {items.length > 0 ? (
-              <ContentGrid>
-                {items.map((item, index) => {
-                  const destination = item.coords || `${item.title}, ${item.address}, Saudi Arabia`;
-                  const mapLabel = `${item.title} ${item.address} Saudi Arabia`;
-                  return (
-                    <Card key={`${item.title}-${index}`}>
-                      {item.kind === 'service'
-                        ? <ServiceIcon>{item.icon}</ServiceIcon>
-                        : <CardImage src={item.image} alt={item.title} />}
-                      <CardContent>
-                        <CardTitle>{item.title}</CardTitle>
-                        <CardDescription>{item.description}</CardDescription>
-                        <InfoItem>📍 {item.address}</InfoItem>
-                        {item.coords && userLocation && <InfoItem>🧭 {isArabic ? 'المسافة التقريبية' : 'Approx. distance'}: {formatDistance(distanceKm(userLocation, item.coords), isArabic)}</InfoItem>}
-                        <InfoItem>🏷️ {item.type}</InfoItem>
-                        {item.extra && <InfoItem>{item.extra}</InfoItem>}
-                        <InfoItem>📱 {item.phone}</InfoItem>
-                        <Actions>
-                          <ActionLink $primary href={makeMapSearchUrl(mapLabel)} target="_blank" rel="noreferrer">
-                            {isArabic ? 'عرض على الخريطة' : 'View on Map'}
-                          </ActionLink>
-                          <ActionLink href={makeDirectionsUrl(destination, userLocation)} target="_blank" rel="noreferrer">
-                            {isArabic ? 'اذهب إليه' : 'Go There'}
-                          </ActionLink>
-                        </Actions>
-                      </CardContent>
-                    </Card>
-                  );
-                })}
-              </ContentGrid>
-            ) : (
-              <EmptyState>{isArabic ? 'لا توجد نتائج مطابقة للبحث في هذا القسم.' : 'No matching results found in this section.'}</EmptyState>
-            )}
-          </>
-        ) : (
-          <EmptyState>
-            {isArabic
-              ? 'اختر مدينة من البطاقات أعلاه لعرض المعالم، الخرائط، الفنادق، المطاعم، الترفيه، والخدمات العامة.'
-              : 'Select a city above to view attractions, maps, hotels, restaurants, entertainment, and public services.'}
-          </EmptyState>
-        )}
-      </Section>
+          {selectedCity && (
+            <SidebarSection ref={contentRef}>
+              <SectionTitle><span>{isArabic ? 'استكشف' : 'Explore'} {cityName}</span></SectionTitle>
+              <TabsContainer>
+                {Object.keys(CATEGORY_META).filter(c => c !== 'all').map(category => (
+                  <Tab key={category} $active={activeTab === category} onClick={() => setActiveTab(category)}>
+                    {React.createElement(CATEGORY_META[category].icon)}
+                    {getCategoryText(category, isArabic)}
+                  </Tab>
+                ))}
+              </TabsContainer>
+              
+              <ScrollableContent>
+                {items.length > 0 ? (
+                  <ContentGrid>
+                    {items.map((item, index) => {
+                      const destination = item.coords || `${item.title}, ${item.address}, Saudi Arabia`;
+                      const mapLabel = `${item.title} ${item.address} Saudi Arabia`;
+                      return (
+                        <Card key={`${item.title}-${index}`}>
+                          {item.kind === 'service'
+                            ? <ServiceIcon>{item.icon}</ServiceIcon>
+                            : <CardImage src={item.image} alt={item.title} />}
+                          <CardContent>
+                            <CardTitle>{item.title}</CardTitle>
+                            <CardDescription>{item.description}</CardDescription>
+                            <InfoItem>📍 {item.address}</InfoItem>
+                            {item.coords && userLocation && <InfoItem>🧭 {isArabic ? 'المسافة' : 'Distance'}: {formatDistance(distanceKm(userLocation, item.coords), isArabic)}</InfoItem>}
+                            <InfoItem>🏷️ {item.type}</InfoItem>
+                            {item.extra && <InfoItem>{item.extra}</InfoItem>}
+                            <InfoItem>📱 {item.phone}</InfoItem>
+                            <Actions>
+                              <ActionLink $primary href={makeMapSearchUrl(mapLabel)} target="_blank" rel="noreferrer">
+                                {isArabic ? 'عرض على الخريطة' : 'View on Map'}
+                              </ActionLink>
+                              <ActionLink href={makeDirectionsUrl(destination, userLocation)} target="_blank" rel="noreferrer">
+                                {isArabic ? 'اذهب إليه' : 'Go There'}
+                              </ActionLink>
+                            </Actions>
+                          </CardContent>
+                        </Card>
+                      );
+                    })}
+                  </ContentGrid>
+                ) : (
+                  <EmptyState>{isArabic ? 'لا توجد نتائج مطابقة للبحث في هذا القسم.' : 'No matching results found in this section.'}</EmptyState>
+                )}
+              </ScrollableContent>
+            </SidebarSection>
+          )}
+        </Sidebar>
+      </PageLayout>
     </Container>
   );
 };

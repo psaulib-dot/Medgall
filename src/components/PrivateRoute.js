@@ -1,12 +1,11 @@
 import React from 'react';
-import { Navigate, Outlet } from 'react-router-dom';
+import { Navigate } from 'react-router-dom';
 import { useAuth } from '../hooks/useAuth';
 
-const PrivateRoute = () => {
+const PrivateRoute = ({ children }) => {
   const { user } = useAuth();
 
-  // Check for admin role here in a real app
-  return user ? <Outlet /> : <Navigate to="/login" />;
+  return user && user.role === 'admin' ? children : <Navigate to="/" />;
 };
 
 export default PrivateRoute;

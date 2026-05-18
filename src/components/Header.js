@@ -3,6 +3,7 @@ import styled from 'styled-components';
 import { Link, useLocation, useNavigate } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { getSession, signOutUser } from '../supabaseService';
+import { useAuth } from '../hooks/useAuth';
 
 // ============ NAVBAR STYLING ============
 
@@ -108,9 +109,11 @@ const NavLinks = styled.nav`
 
     &.active {
       color: #C6A75E;
+      text-decoration: none;
 
       &::after {
         width: 100%;
+        text-decoration: none;
       }
     }
   }
@@ -221,12 +224,15 @@ const MobileMenu = styled.div`
       background-color: rgba(198, 167, 94, 0.1);
       border-left-color: #C6A75E;
       color: #C6A75E;
+      text-decoration: none;
+
     }
 
     &.active {
       background-color: rgba(198, 167, 94, 0.2);
       border-left-color: #C6A75E;
       color: #C6A75E;
+      text-decoration: none;
     }
   }
 
@@ -239,6 +245,7 @@ const Header = () => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [activeButton, setActiveButton] = useState(null);
   const [isLoggedIn, setIsLoggedIn] = useState(false);
+  const { user } = useAuth();
   const location = useLocation();
   const navigate = useNavigate();
   const { t, i18n } = useTranslation();
@@ -269,6 +276,8 @@ const Header = () => {
       setActiveButton('login');
     } else if (currentPath === '/profile') {
       setActiveButton('profile');
+    } else if (currentPath === '/admin') {
+      setActiveButton('admin');
     }
 
     const token = localStorage.getItem('authToken') || getSession()?.access_token;
@@ -338,6 +347,15 @@ const Header = () => {
             onClick={() => setActiveButton('profile')}
           >
             {t('header.profile') || 'Profile'}
+          </Link>
+        )}
+        {user && user.role === 'admin' && (
+          <Link
+            to="/admin"
+            className={activeButton === 'admin' ? 'active' : ''}
+            onClick={() => setActiveButton('admin')}
+          >
+            {t('header.admin') || 'Admin'}
           </Link>
         )}
       </NavLinks>
@@ -430,6 +448,18 @@ const Header = () => {
             }}
           >
             {t('header.profile') || 'Profile'}
+          </Link>
+        )}
+        {user && user.role === 'admin' && (
+          <Link
+            to="/admin"
+            className={activeButton === 'admin' ? 'active' : ''}
+            onClick={() => {
+              setActiveButton('admin');
+              closeMenu();
+            }}
+          >
+            {t('header.admin') || 'Admin'}
           </Link>
         )}
       </MobileMenu>

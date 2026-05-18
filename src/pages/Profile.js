@@ -2,121 +2,170 @@ import React, { useEffect, useState } from 'react';
 import styled from 'styled-components';
 import { useTranslation } from 'react-i18next';
 import { getCurrentUserProfile } from '../supabaseService';
+import { useAuth } from '../hooks/useAuth';
+import { Link } from 'react-router-dom';
+import { FaUser, FaEnvelope, FaShieldAlt } from 'react-icons/fa';
 
-const ProfileContainer = styled.div`
-  min-height: calc(100vh - var(--header-height));
-  padding: 32px 16px 48px;
-  background: linear-gradient(135deg, #f5f0e8 0%, #e8dcc8 100%);
+const ProfilePage = styled.div`
   display: flex;
   justify-content: center;
-  align-items: center;
-
-  @media (min-width: 768px) {
-    padding: 40px 24px 60px;
-  }
+  align-items: flex-start;
+  min-height: 100vh;
+  padding: 80px 16px;
+  background: #F4F1ED;
+  font-family: '29LT Riwaya', sans-serif;
 `;
 
 const ProfileCard = styled.div`
-  width: 100%;
-  max-width: 560px;
-  background: linear-gradient(145deg, #ffffff 0%, #faf8f5 100%);
+  background: #FFFFFF;
+  padding: 48px;
   border-radius: 24px;
-  border: 2px solid #C6A75E;
-  box-shadow: 0 20px 48px rgba(139, 90, 43, 0.16);
-  padding: 36px 28px;
-  font-family: 'Georgia', serif;
-`;
-
-const Heading = styled.h1`
-  margin: 0 0 24px;
-  font-size: 32px;
-  font-weight: 700;
-  color: #0F1C2E;
+  box-shadow: 0 16px 40px rgba(0, 0, 0, 0.12);
+  width: 100%;
+  max-width: 600px;
   text-align: center;
+  direction: ${props => props.dir};
 `;
 
-const Field = styled.div`
+const Title = styled.h1`
+  font-size: 36px;
+  color: #8B5A2B;
+  margin-bottom: 16px;
+  font-weight: 700;
+  position: relative;
+  display: inline-block;
+
+  &::after {
+    content: '';
+    position: absolute;
+    width: 60%;
+    height: 3px;
+    background: linear-gradient(to right, #C6A75E, #8B5A2B);
+    bottom: -8px;
+    left: 50%;
+    transform: translateX(-50%);
+    border-radius: 2px;
+  }
+`;
+
+const InfoSection = styled.div`
+  margin-top: 40px;
+  text-align: ${props => props.dir === 'rtl' ? 'right' : 'left'};
+`;
+
+const InfoRow = styled.div`
   display: flex;
-  justify-content: space-between;
-  align-items: flex-start;
+  align-items: center;
   gap: 16px;
-  margin-bottom: 20px;
+  margin-bottom: 24px;
+  font-size: 18px;
+`;
+
+const Icon = styled.div`
+  color: #C6A75E;
+  font-size: 24px;
 `;
 
 const Label = styled.span`
-  color: #8B5A2B;
   font-weight: 700;
-  width: 35%;
+  color: #8B5A2B;
 `;
 
 const Value = styled.span`
-  color: #4A4A4A;
-  width: 65%;
-  word-break: break-word;
+  color: #333;
+`;
+
+const AdminSection = styled.div`
+  margin-top: 40px;
+  padding: 24px;
+  background: #F9F5F0;
+  border-radius: 12px;
+  border: 1px dashed #C6A75E;
+`;
+
+const AdminLink = styled(Link)`
+  display: inline-block;
+  margin-top: 16px;
+  padding: 12px 24px;
+  background: linear-gradient(to right, #8B5A2B, #C6A75E);
+  color: white;
+  text-decoration: none;
+  border-radius: 8px;
+  font-weight: 700;
+  transition: all 0.3s ease;
+
+  &:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 8px 24px rgba(198, 167, 94, 0.3);
+  }
 `;
 
 const EmptyState = styled.p`
   color: #6B4423;
   text-align: center;
   font-size: 18px;
-  margin: 0;
+  margin-top: 40px;
 `;
 
 const Profile = () => {
   const { t, i18n } = useTranslation();
+  const { user } = useAuth();
   const [profile, setProfile] = useState(null);
+  const isArabic = i18n.language === 'ar';
 
   useEffect(() => {
-    const storedProfile = getCurrentUserProfile();
-    if (storedProfile?.email) {
-      setProfile(storedProfile);
-      return;
-    }
-
-    const fallbackProfile = {
-      username: localStorage.getItem('userName') || '',
-      email: localStorage.getItem('userEmail') || '',
-      role: localStorage.getItem('userRole') || '',
+    const fetchProfile = async () => {
+      const userProfile = await getCurrentUserProfile();
+      setProfile(userProfile);
     };
 
-    if (fallbackProfile.email) {
-      setProfile(fallbackProfile);
+    if (user) {
+      fetchProfile();
     }
-  }, []);
+  }, [user]);
 
-  if (!profile?.email) {
+  if (!profile) {
     return (
-      <ProfileContainer dir={i18n.language === 'ar' ? 'rtl' : 'ltr'}>
-        <ProfileCard>
-          <Heading>{t('profile.title') || 'Profile'}</Heading>
-          <EmptyState>{t('profile.notLoggedIn') || 'No user is currently logged in.'}</EmptyState>
+      <ProfilePage>
+        <ProfileCard dir={isArabic ? 'rtl' : 'ltr'}>
+          <Title>{t('profile.title')}</Title>
+          <EmptyState>{t('profile.notLoggedIn')}</EmptyState>
         </ProfileCard>
-      </ProfileContainer>
+      </ProfilePage>
     );
   }
 
   return (
-    <ProfileContainer dir={i18n.language === 'ar' ? 'rtl' : 'ltr'}>
-      <ProfileCard>
-        <Heading>{t('profile.heading') || 'Your Profile'}</Heading>
-        <Field>
-          <Label>{t('profile.username') || 'Username'}</Label>
-          <Value>{profile.username || '-'}</Value>
-        </Field>
-        <Field>
-          <Label>{t('profile.email') || 'Email'}</Label>
-          <Value>{profile.email}</Value>
-        </Field>
-        <Field>
-          <Label>{t('profile.role') || 'Role'}</Label>
-          <Value>{profile.role || 'visitor'}</Value>
-        </Field>
-        <Field>
-          <Label>{t('profile.source') || 'Profile Source'}</Label>
-          <Value>{profile.id ? (t('profile.sourceSupabase') || 'Supabase / local stored profile') : (t('profile.sourceLocal') || 'Local fallback')}</Value>
-        </Field>
+    <ProfilePage>
+      <ProfileCard dir={isArabic ? 'rtl' : 'ltr'}>
+        <Title>{t('profile.title')}</Title>
+        <InfoSection dir={isArabic ? 'rtl' : 'ltr'}>
+          <InfoRow>
+            <Icon><FaUser /></Icon>
+            <Label>{t('profile.username')}:</Label>
+            <Value>{profile.username}</Value>
+          </InfoRow>
+          <InfoRow>
+            <Icon><FaEnvelope /></Icon>
+            <Label>{t('profile.email')}:</Label>
+            <Value>{profile.email}</Value>
+          </InfoRow>
+          <InfoRow>
+            <Icon><FaShieldAlt /></Icon>
+            <Label>{t('profile.role')}:</Label>
+            <Value>{t(`roles.${profile.role}`)}</Value>
+          </InfoRow>
+        </InfoSection>
+
+        {profile.role === 'admin' && (
+          <AdminSection>
+            <h3>{t('profile.admin.title')}</h3>
+            <p>{t('profile.admin.description')}</p>
+            <AdminLink to="/admin">{t('profile.admin.link')}</AdminLink>
+          </AdminSection>
+        )}
       </ProfileCard>
-    </ProfileContainer>
+    </ProfilePage>
   );
 };
 

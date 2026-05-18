@@ -1,10 +1,19 @@
 // Test Supabase Connection
 const { createClient } = require('@supabase/supabase-js');
+const ws = require('ws');
 
 const SUPABASE_URL = 'https://tbzovlwniopojywvfffb.supabase.co';
 const SUPABASE_ANON_KEY = 'sb_publishable_enWWjp80dNXhge25iZ2vlg_ZcQRKy8Y';
 
-const supabase = createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+const supabase = createClient(SUPABASE_URL, SUPABASE_ANON_KEY, {
+  auth: {
+    autoRefreshToken: false,
+    persistSession: false
+  },
+  global: {
+    WebSocket: ws,
+  }
+});
 
 async function testConnection() {
   console.log('🔍 Testing Supabase Connection...\n');
@@ -52,6 +61,8 @@ async function testConnection() {
 
   } catch (error) {
     console.error('❌ Connection test failed:', error.message);
+  } finally {
+    supabase.auth.signOut();
   }
 }
 

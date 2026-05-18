@@ -28,12 +28,7 @@ import Feedback from './pages/Feedback';
 import Settings from './pages/Settings';
 
 // Admin
-import AdminDashboard from './admin/AdminDashboard';
-import CategoryManagement from './admin/CategoryManagement';
-import CityManagement from './admin/CityManagement';
-import PlaceManagement from './admin/PlaceManagement';
-import MessageManagement from './admin/MessageManagement';
-import FeedbackManagement from './admin/FeedbackManagement';
+import AdminDashboard from './pages/admin/AdminDashboard';
 
 // Context
 import { AuthProvider } from './hooks/useAuth';
@@ -50,8 +45,7 @@ function App() {
   }, [i18n.language]);
 
   const authRoutes = ['/login', '/signup', '/forgot'];
-  const showHeaderFooter = !location.pathname.startsWith('/admin-dashboard') && !location.pathname.startsWith('/visitor-dashboard') && !authRoutes.includes(location.pathname);
-
+  const showHeaderFooter = !location.pathname.startsWith('/admin') && !location.pathname.startsWith('/visitor-dashboard') && !authRoutes.includes(location.pathname);
 
   return (
     <AuthProvider>
@@ -82,7 +76,7 @@ function App() {
 
             {/* User Routes */}
             <Route path="/visitor-dashboard" element={<PrivateRoute />}>
-              <Route path="" element={<VisitorDashboard />}>
+              <Route path="/" element={<VisitorDashboard />}>
                 <Route index element={<Profile />} />
                 <Route path="profile" element={<Profile />} />
                 <Route path="favorites" element={<Favorites />} />
@@ -92,15 +86,7 @@ function App() {
             </Route>
 
             {/* Admin Routes */}
-            <Route path="/admin-dashboard" element={<PrivateRoute />}>
-              <Route path="" element={<AdminDashboard />}>
-                <Route path="categories" element={<CategoryManagement />} />
-                <Route path="cities" element={<CityManagement />} />
-                <Route path="places" element={<PlaceManagement />} />
-                <Route path="messages" element={<MessageManagement />} />
-                <Route path="feedback" element={<FeedbackManagement />} />
-              </Route>
-            </Route>
+            <Route path="/admin" element={<PrivateRoute component={AdminDashboard} />} />
           </Routes>
         </main>
         {showHeaderFooter && <Footer />}

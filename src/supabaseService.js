@@ -163,15 +163,26 @@ export const getProfile = async (id, accessToken = getAccessToken()) => {
   return rows?.[0] || null;
 };
 
-const getFallbackImage = (cityNameEn, field, index = 0) => {
-  const fallbackCity = citiesDataBilingual[cityNameEn] || Object.values(citiesDataBilingual)[0];
-  if (!fallbackCity) return '';
-  if (field === 'city') return fallbackCity.mainImage;
-  if (field === 'attractions') return fallbackCity.attractions?.items?.[index % fallbackCity.attractions.items.length]?.image || fallbackCity.mainImage;
-  if (field === 'hotels') return fallbackCity.hotels?.[index % fallbackCity.hotels.length]?.image || fallbackCity.mainImage;
-  if (field === 'restaurants') return fallbackCity.restaurants?.[index % fallbackCity.restaurants.length]?.image || fallbackCity.mainImage;
-  if (field === 'entertainment') return fallbackCity.entertainment?.[index % (fallbackCity.entertainment?.length || 1)]?.image || fallbackCity.mainImage;
-  return fallbackCity.mainImage;
+export const addContactMessage = async (formData, accessToken = getAccessToken()) => {
+  const { name, email, subject = 'Website message', message } = formData;
+  const user = getCurrentUserProfile();
+
+  if (!isSupabaseConfigured) {
+    const localMessages = JSON.parse(localStorage.getItem('medhalContactMessages') || '[]');
+    localStorage.setItem('medhalContactMessages', JSON.stringify([
+      ...localMessages,
+      { name, email, subject, message, created_at: new Date().toISOString(), user_id: user?.id || null },
+    ]));
+    return { local: true };
+  }
+
+  const rows = await request('/rest/v1/contact_messages', {
+    method: 'POST',
+    accessToken, // Pass the authentication token
+    headers: { Prefer: 'return=representation' },
+    body: JSON.stringify({ name, email, subject, message, user_id: user?.id || null }),
+  });
+  return rows?.[0] || null;
 };
 
 const textObj = (row, nameField = 'name') => ({
@@ -218,7 +229,7 @@ export const getTourismGuideData = async () => {
       normalizedCities[cityKey] = {
         ar: { name: city.name_ar, label: city.name_ar },
         en: { name: city.name_en, label: city.name_en },
-        mainImage: city.image_url || getFallbackImage(city.name_en, 'city'),
+        mainImage: city.image_url, // Directly use image_url
         attractions: { items: [] },
         hotels: [],
         restaurants: [],
@@ -237,7 +248,7 @@ export const getTourismGuideData = async () => {
       const base = textObj(place);
       const category = place.category;
       const common = {
-        image: place.image_url || getFallbackImage(city.name_en, category, index),
+        image: place.image_url, // Directly use image_url
         rating: place.rating ? `${place.rating}` : place.stars ? `${place.stars} stars` : '',
         coords: place.latitude && place.longitude ? { lat: Number(place.latitude), lng: Number(place.longitude) } : null,
         icon: place.icon || '📍',
@@ -264,25 +275,6 @@ export const getTourismGuideData = async () => {
   }
 };
 
-
-export const submitContactMessage = async ({ name, email, subject = 'Website message', message }) => {
-  if (!isSupabaseConfigured) {
-    const localMessages = JSON.parse(localStorage.getItem('medhalContactMessages') || '[]');
-    localStorage.setItem('medhalContactMessages', JSON.stringify([
-      ...localMessages,
-      { name, email, subject, message, created_at: new Date().toISOString() },
-    ]));
-    return { local: true };
-  }
-
-  const rows = await request('/rest/v1/contact_messages', {
-    method: 'POST',
-    headers: { Prefer: 'return=representation' },
-    body: JSON.stringify({ name, email, subject, message }),
-  });
-  return rows?.[0] || null;
-};
-
 export const submitFeedback = async ({ name, email, rating = 5, message }) => {
   if (!isSupabaseConfigured) {
     const localFeedback = JSON.parse(localStorage.getItem('medhalFeedback') || '[]');
@@ -293,13 +285,11 @@ export const submitFeedback = async ({ name, email, rating = 5, message }) => {
     return { local: true };
   }
 
-  // Create feedback table if it doesn't exist
   const rows = await request('/rest/v1/feedback', {
     method: 'POST',
     headers: { Prefer: 'return=representation' },
     body: JSON.stringify({ name, email, rating, message }),
   }).catch(() => {
-    // Fallback to localStorage if table doesn't exist
     const localFeedback = JSON.parse(localStorage.getItem('medhalFeedback') || '[]');
     localStorage.setItem('medhalFeedback', JSON.stringify([
       ...localFeedback,
@@ -313,13 +303,10 @@ export const submitFeedback = async ({ name, email, rating = 5, message }) => {
 
 export const getFeedback = async () => {
   if (!isSupabaseConfigured) {
-    const localFeedback = JSON.parse(localStorage.getItem('medhalFeedback') || '[]');
-    return localFeedback;
+    return JSON.parse(localStorage.getItem('medhalFeedback') || '[]');
   }
-
   try {
-    const feedback = await request('/rest/v1/feedback?order=created_at.desc');
-    return feedback || [];
+    return await request('/rest/v1/feedback?order=created_at.desc') || [];
   } catch (error) {
     console.error('Error fetching feedback:', error);
     return [];
@@ -328,17 +315,66 @@ export const getFeedback = async () => {
 
 export const getContactMessages = async () => {
   if (!isSupabaseConfigured) {
-    const localMessages = JSON.parse(localStorage.getItem('medhalContactMessages') || '[]');
-    return localMessages;
+    return JSON.parse(localStorage.getItem('medhalContactMessages') || '[]');
   }
-
   try {
-    const messages = await request('/rest/v1/contact_messages?order=created_at.desc');
-    return messages || [];
+    return await request('/rest/v1/contact_messages?order=created_at.desc') || [];
   } catch (error) {
     console.error('Error fetching contact messages:', error);
     return [];
   }
 };
+
+// Admin functions
+export const getAllAdminData = async (accessToken = getAccessToken()) => {
+  if (!isSupabaseConfigured) throw new Error('Supabase not configured');
+
+  try {
+    const [cities, places, users, messages, feedback] = await Promise.all([
+      request('/rest/v1/cities?select=*&order=name_en.asc', { accessToken }),
+      request('/rest/v1/places?select=*', { accessToken }),
+      request('/rest/v1/profiles?select=*', { accessToken }),
+      request('/rest/v1/contact_messages?select=*', { accessToken }),
+      request('/rest/v1/feedback?select=*', { accessToken }),
+    ]);
+
+    return {
+      cities: cities || [],
+      places: places || [],
+      users: users || [],
+      messages: messages || [],
+      feedback: feedback || [],
+    };
+  } catch (error) {
+    console.error("Error fetching all admin data:", error);
+    return { cities: [], places: [], users: [], messages: [], feedback: [] };
+  }
+};
+
+export const deleteItem = async ({ tableName, id, accessToken = getAccessToken() }) => {
+  return request(`/rest/v1/${tableName}?id=eq.${id}`, {
+    method: 'DELETE',
+    accessToken,
+  });
+};
+
+export const upsertItem = async ({ tableName, item, accessToken = getAccessToken() }) => {
+  return request(`/rest/v1/${tableName}?on_conflict=id`, {
+    method: 'POST',
+    accessToken,
+    headers: { Prefer: 'resolution=merge-duplicates,return=representation' },
+    body: JSON.stringify(item),
+  });
+};
+
+export const updateUserRole = async ({ id, role, accessToken = getAccessToken() }) => {
+  return request(`/rest/v1/profiles?id=eq.${id}`, {
+    method: 'PATCH',
+    accessToken,
+    headers: { Prefer: 'return=representation' },
+    body: JSON.stringify({ role }),
+  });
+};
+
 
 export { isSupabaseConfigured };
