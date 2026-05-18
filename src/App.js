@@ -75,7 +75,7 @@ function App() {
             <Route path="/contact" element={<Contact />} />
 
             {/* User Routes */}
-            <Route path="/visitor-dashboard" element={<PrivateRoute />}>
+            <Route path="/visitor-dashboard/*" element={<PrivateRoute />}>
               <Route element={<VisitorDashboard />}>
                 <Route index element={<Navigate to="profile" replace />} />
                 <Route path="profile" element={<Profile />} />
@@ -86,7 +86,9 @@ function App() {
             </Route>
 
             {/* Admin Routes */}
-            <Route path="/admin" element={<PrivateRoute component={AdminDashboard} />} />
+            <Route path="/admin" element={<PrivateRoute requiredRole="admin" />}>
+                <Route index element={<AdminDashboard />} />
+            </Route>
           </Routes>
         </main>
         {showHeaderFooter && <Footer />}
