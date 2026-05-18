@@ -86,7 +86,7 @@ function App() {
             </Route>
 
             {/* Admin Routes */}
-            <Route path="/admin" element={<PrivateRoute component={AdminDashboard} />} />
+            <Route path="/admin" element={<PrivateRoute><AdminDashboard /></PrivateRoute>} />
           </Routes>
         </main>
         {showHeaderFooter && <Footer />}

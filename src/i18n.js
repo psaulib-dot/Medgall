@@ -20,6 +20,10 @@ i18n
     fallbackLng: 'ar',
     interpolation: {
       escapeValue: false
+    },
+    // Add a cache-busting query parameter
+    backend: {
+      loadPath: '/locales/{{lng}}.json?v=1.0.1',
     }
   });
 
