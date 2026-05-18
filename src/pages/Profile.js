@@ -1,11 +1,12 @@
-import React, { useEffect, useState } from 'react';
+
+import React from 'react';
 import styled from 'styled-components';
 import { useTranslation } from 'react-i18next';
-import { getCurrentUserProfile } from '../supabaseService';
 import { useAuth } from '../hooks/useAuth';
 import { Link } from 'react-router-dom';
 import { FaUser, FaEnvelope, FaShieldAlt } from 'react-icons/fa';
 
+// Re-using the same styled components from the previous version
 const ProfilePage = styled.div`
   display: flex;
   justify-content: center;
@@ -107,61 +108,70 @@ const EmptyState = styled.p`
   margin-top: 40px;
 `;
 
+const LoadingState = styled(EmptyState)``; // Re-use style for consistency
+
 const Profile = () => {
   const { t, i18n } = useTranslation();
-  const { user } = useAuth();
-  const [profile, setProfile] = useState(null);
+  const { user, loading } = useAuth(); // We get the user and loading state directly from our new hook
   const isArabic = i18n.language === 'ar';
 
-  useEffect(() => {
-    const fetchProfile = async () => {
-      const userProfile = await getCurrentUserProfile();
-      setProfile(userProfile);
-    };
+  console.log('Profile Page loaded. State:', { user, loading });
 
-    if (user) {
-      fetchProfile();
-    }
-  }, [user]);
-
-  if (!profile) {
+  // 1. Handle Loading State
+  if (loading) {
     return (
       <ProfilePage>
         <ProfileCard dir={isArabic ? 'rtl' : 'ltr'}>
           <Title>{t('profile.title')}</Title>
-          <EmptyState>{t('profile.notLoggedIn')}</EmptyState>
+          <LoadingState>{t('loading', 'Loading profile...')}</LoadingState>
         </ProfileCard>
       </ProfilePage>
     );
   }
 
+  // 2. Handle No User Found State
+  if (!user) {
+    // This will show if loading is complete but the user object is still null
+    return (
+      <ProfilePage>
+        <ProfileCard dir={isArabic ? 'rtl' : 'ltr'}>
+          <Title>{t('profile.title')}</Title>
+          <EmptyState>{t('profile.notFound', 'Could not find user profile.')}</EmptyState>
+        </ProfileCard>
+      </ProfilePage>
+    );
+  }
+
+  // 3. Render Profile if user object exists
   return (
     <ProfilePage>
       <ProfileCard dir={isArabic ? 'rtl' : 'ltr'}>
-        <Title>{t('profile.title')}</Title>
+        <Title>{t('profile.title', 'User Profile')}</Title>
         <InfoSection dir={isArabic ? 'rtl' : 'ltr'}>
           <InfoRow>
             <Icon><FaUser /></Icon>
-            <Label>{t('profile.username')}:</Label>
-            <Value>{profile.username}</Value>
+            <Label>{t('profile.username', 'Username')}:</Label>
+            {/* Use user.full_name or a default value */}
+            <Value>{user.full_name || 'N/A'}</Value>
           </InfoRow>
           <InfoRow>
             <Icon><FaEnvelope /></Icon>
-            <Label>{t('profile.email')}:</Label>
-            <Value>{profile.email}</Value>
+            <Label>{t('profile.email', 'Email')}:</Label>
+             {/* The email is on the session, but we'll show it from the profile for consistency */}
+            <Value>{user.email || 'N/A'}</Value>
           </InfoRow>
           <InfoRow>
             <Icon><FaShieldAlt /></Icon>
-            <Label>{t('profile.role')}:</Label>
-            <Value>{t(`roles.${profile.role}`)}</Value>
+            <Label>{t('profile.role', 'Role')}:</Label>
+            <Value>{t(`roles.${user.role}`, user.role)}</Value>
           </InfoRow>
         </InfoSection>
 
-        {profile.role === 'admin' && (
+        {user.role === 'admin' && (
           <AdminSection>
-            <h3>{t('profile.admin.title')}</h3>
-            <p>{t('profile.admin.description')}</p>
-            <AdminLink to="/admin">{t('profile.admin.link')}</AdminLink>
+            <h3>{t('profile.admin.title', 'Admin Area')}</h3>
+            <p>{t('profile.admin.description', 'You have access to the admin dashboard.')}</p>
+            <AdminLink to="/admin">{t('profile.admin.link', 'Go to Dashboard')}</AdminLink>
           </AdminSection>
         )}
       </ProfileCard>

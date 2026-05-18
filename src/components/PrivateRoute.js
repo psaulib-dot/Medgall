@@ -1,39 +1,45 @@
 
 import React from 'react';
-import { Navigate, Outlet } from 'react-router-dom';
+import { Navigate, Outlet, useLocation } from 'react-router-dom';
 import { useAuth } from '../hooks/useAuth';
 
-/**
- * A component to protect routes that require authentication.
- * It can also optionally check for a specific user role.
- *
- * How it works:
- * 1. It retrieves the current user's authentication status using the `useAuth` hook.
- * 2. If the user is not logged in, it redirects them to the /login page.
- * 3. If the route requires a specific role (passed via `requiredRole` prop),
- *    it checks if the user has that role. If not, it redirects them to the home page.
- * 4. If the user is authenticated (and has the required role, if any), it renders
- *    the nested child routes using the `<Outlet />` component from react-router-dom.
- */
 const PrivateRoute = ({ requiredRole }) => {
-  const { user } = useAuth();
+  const { user, loading, session } = useAuth();
+  const location = useLocation();
 
-  // While authentication status is being determined, you could show a loader
-  // For now, we'll proceed directly.
+  console.log('PrivateRoute Check:', { loading, session, user, requiredRole });
 
-  // 1. Check for authentication
+  // 1. Show a loading indicator while the auth state is being determined
+  if (loading) {
+    return <div>Loading... Please wait.</div>; // This is crucial to prevent premature rendering
+  }
+
+  // 2. Check for a valid session. If there is no session, redirect to login.
+  if (!session) {
+    console.log('No session found. Redirecting to /login.');
+    // Preserve the user's intended destination to redirect back after login
+    return <Navigate to="/login" state={{ from: location }} replace />;
+  }
+
+  // 3. Session exists, but the user profile might still be loading or failed to load.
+  // If there's no user object (profile), they are not truly authenticated yet.
   if (!user) {
-    // Redirect to login page if not authenticated, preserving the intended destination
+    // This can happen briefly while the profile is being fetched.
+    // Or if fetching the profile failed, in which case they can't access protected routes.
+    console.log('Session exists, but no user profile. Access denied.');
+    // You could redirect to a specific error page or back to login.
     return <Navigate to="/login" replace />;
   }
 
-  // 2. Check for authorization (role-based access)
+  // 4. Check for authorization (role-based access) if a requiredRole is specified.
   if (requiredRole && user.role !== requiredRole) {
-    // Redirect to home page if the user does not have the necessary role
-    return <Navigate to="/" replace />;
+    console.log(`Authorization failed. User role: ${user.role}, Required role: ${requiredRole}. Redirecting to /unauthorized.`);
+    // User is logged in but does not have the necessary permissions.
+    return <Navigate to="/unauthorized" replace />;
   }
 
-  // 3. Render the protected content
+  // 5. If all checks pass, render the nested child routes.
+  console.log('All checks passed. Rendering protected content.');
   return <Outlet />;
 };
 

@@ -26,6 +26,7 @@ import VisitorDashboard from './pages/VisitorDashboard';
 import Favorites from './pages/Favorites';
 import Feedback from './pages/Feedback';
 import Settings from './pages/Settings';
+import Unauthorized from './pages/Unauthorized'; // Import the Unauthorized page
 
 // Admin
 import AdminDashboard from './pages/admin/AdminDashboard';
@@ -44,7 +45,7 @@ function App() {
     document.body.dir = direction;
   }, [i18n.language]);
 
-  const authRoutes = ['/login', '/signup', '/forgot'];
+  const authRoutes = ['/login', '/signup', '/forgot', '/unauthorized'];
   const showHeaderFooter = !location.pathname.startsWith('/admin') && !location.pathname.startsWith('/visitor-dashboard') && !authRoutes.includes(location.pathname);
 
   return (
@@ -73,9 +74,10 @@ function App() {
             <Route path="/forgot" element={<ForgotPassword />} />
             <Route path="/about" element={<AboutMedhal />} />
             <Route path="/contact" element={<Contact />} />
+            <Route path="/unauthorized" element={<Unauthorized />} />
 
-            {/* User Routes */}
-            <Route path="/visitor-dashboard/*" element={<PrivateRoute />}>
+            {/* User Routes (Visitor Dashboard) */}
+            <Route path="/visitor-dashboard" element={<PrivateRoute />}>
               <Route element={<VisitorDashboard />}>
                 <Route index element={<Navigate to="profile" replace />} />
                 <Route path="profile" element={<Profile />} />
