@@ -2,10 +2,9 @@ import React, { useState, useEffect } from 'react';
 import styled from 'styled-components';
 import { Link, useLocation, useNavigate } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
-import { getSession, signOutUser } from '../supabaseService';
 import { useAuth } from '../hooks/useAuth';
 
-// ============ NAVBAR STYLING ============
+// ========= STYLED COMPONENTS (remain unchanged) =========
 
 const HeaderContainer = styled.header`
   position: fixed;
@@ -32,7 +31,6 @@ const HeaderContainer = styled.header`
   }
 `;
 
-// Logo + Text on left
 const LogoSection = styled.div`
   display: flex;
   align-items: center;
@@ -68,7 +66,6 @@ const LogoText = styled.span`
   }
 `;
 
-// Centered Navigation Links
 const NavLinks = styled.nav`
   display: flex;
   gap: 40px;
@@ -127,7 +124,6 @@ const NavLinks = styled.nav`
   }
 `;
 
-// Language Toggle Button (Right side)
 const LanguageToggle = styled.button`
   background-color: transparent;
   border: 2px solid #ffffff;
@@ -176,7 +172,6 @@ const AuthButton = styled.button`
   }
 `;
 
-// Hamburger Menu (Mobile)
 const HamburgerMenu = styled.button`
   display: none;
   background: none;
@@ -195,7 +190,6 @@ const HamburgerMenu = styled.button`
   }
 `;
 
-// Mobile Menu
 const MobileMenu = styled.div`
   position: fixed;
   top: var(--header-height);
@@ -244,67 +238,50 @@ const MobileMenu = styled.div`
 const Header = () => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [activeButton, setActiveButton] = useState(null);
-  const [isLoggedIn, setIsLoggedIn] = useState(false);
-  const { user } = useAuth();
+  const { user, signOut } = useAuth(); // Use the reliable user object and signOut from our hook
   const location = useLocation();
   const navigate = useNavigate();
   const { t, i18n } = useTranslation();
   const isArabic = i18n.language === 'ar';
 
-  // Toggle the dropdown menu
-  const toggleMenu = () => {
-    setIsMenuOpen(!isMenuOpen);
-  };
+  const toggleMenu = () => setIsMenuOpen(!isMenuOpen);
+  const closeMenu = () => setIsMenuOpen(false);
 
-  // Close menu when link is clicked
-  const closeMenu = () => {
-    setIsMenuOpen(false);
-  };
-
-  // Update active button and login state whenever the route changes
+  // Update active button based on the current path
   useEffect(() => {
     const currentPath = location.pathname;
-    if (currentPath === '/') {
-      setActiveButton('home');
-    } else if (currentPath === '/about') {
-      setActiveButton('about');
-    } else if (currentPath === '/acplaces') {
-      setActiveButton('destinations');
-    } else if (currentPath === '/contact') {
-      setActiveButton('contact');
-    } else if (currentPath === '/login') {
-      setActiveButton('login');
-    } else if (currentPath === '/profile') {
-      setActiveButton('profile');
-    } else if (currentPath === '/admin') {
-      setActiveButton('admin');
-    }
-
-    const token = localStorage.getItem('authToken') || getSession()?.access_token;
-    setIsLoggedIn(!!token);
+    if (currentPath === '/') setActiveButton('home');
+    else if (currentPath === '/about') setActiveButton('about');
+    else if (currentPath === '/acplaces') setActiveButton('destinations');
+    else if (currentPath === '/contact') setActiveButton('contact');
+    else if (currentPath === '/login') setActiveButton('login');
+    else if (currentPath.startsWith('/visitor-dashboard')) setActiveButton('profile'); // CORRECT: Highlight profile for any dashboard page
+    else if (currentPath.startsWith('/admin')) setActiveButton('admin');
+    else setActiveButton(null);
   }, [location]);
 
-  // Handle language toggle
   const toggleLanguage = () => {
     const newLang = isArabic ? 'en' : 'ar';
     i18n.changeLanguage(newLang);
     localStorage.setItem('language', newLang);
-    document.documentElement.lang = newLang;
-    document.documentElement.dir = newLang === 'ar' ? 'rtl' : 'ltr';
   };
 
-  // Handle logout functionality
   const handleLogout = async () => {
-    await signOutUser();
-    setIsLoggedIn(false);
+    await signOut(); // CORRECT: Use signOut from useAuth hook
     setActiveButton(null);
     closeMenu();
     navigate('/');
   };
 
+  const navLinkItems = [
+    { to: "/", name: "home", label: t('header.home', 'Home') },
+    { to: "/acplaces", name: "destinations", label: t('header.destinations', 'Destinations') },
+    { to: "/about", name: "about", label: t('header.about', 'About Us') },
+    { to: "/contact", name: "contact", label: t('header.contact', 'Contact') },
+  ];
+
   return (
     <HeaderContainer dir={isArabic ? 'rtl' : 'ltr'}>
-      {/* Logo Section */}
       <LogoSection onClick={() => navigate('/')}> 
         <LogoImage src="/logo.png" alt="Medhal Logo" />
         <LogoText>{isArabic ? 'مدهال' : 'MEDHAL'}</LogoText>
@@ -312,63 +289,34 @@ const Header = () => {
 
       {/* Centered Navigation */}
       <NavLinks>
-        <Link
-          to="/"
-          className={activeButton === 'home' ? 'active' : ''}
-          onClick={() => setActiveButton('home')}
-        >
-          {t('header.home') || 'Home'}
-        </Link>
-        <Link
-          to="/acplaces"
-          className={activeButton === 'destinations' ? 'active' : ''}
-          onClick={() => setActiveButton('destinations')}
-        >
-          {t('header.destinations') || 'Destinations'}
-        </Link>
-        <Link
-          to="/about"
-          className={activeButton === 'about' ? 'active' : ''}
-          onClick={() => setActiveButton('about')}
-        >
-          {t('header.about') || 'About Us'}
-        </Link>
-        <Link
-          to="/contact"
-          className={activeButton === 'contact' ? 'active' : ''}
-          onClick={() => setActiveButton('contact')}
-        >
-          {t('header.contact') || 'Contact'}
-        </Link>
-        {isLoggedIn && (
-          <Link
-            to="/profile"
-            className={activeButton === 'profile' ? 'active' : ''}
-            onClick={() => setActiveButton('profile')}
-          >
-            {t('header.profile') || 'Profile'}
+        {navLinkItems.map(item => (
+          <Link key={item.name} to={item.to} className={activeButton === item.name ? 'active' : ''}>
+            {item.label}
+          </Link>
+        ))}
+        {/* CORRECT: Show Profile link only when user is logged in, and link to the correct path */}
+        {user && (
+          <Link to="/visitor-dashboard/profile" className={activeButton === 'profile' ? 'active' : ''}>
+            {t('header.profile', 'Profile')}
           </Link>
         )}
         {user && user.role === 'admin' && (
-          <Link
-            to="/admin"
-            className={activeButton === 'admin' ? 'active' : ''}
-            onClick={() => setActiveButton('admin')}
-          >
-            {t('header.admin') || 'Admin'}
+          <Link to="/admin" className={activeButton === 'admin' ? 'active' : ''}>
+            {t('header.admin', 'Admin')}
           </Link>
         )}
       </NavLinks>
 
-      {/* Language Toggle + Hamburger */}
+      {/* Right-aligned controls */}
       <div style={{ display: 'flex', gap: '16px', alignItems: 'center' }}>
         <LanguageToggle onClick={toggleLanguage}>
           {isArabic ? 'English' : 'العربية'}
         </LanguageToggle>
-        {isLoggedIn ? (
-          <AuthButton onClick={handleLogout}>{t('header.logout') || 'Logout'}</AuthButton>
+        {/* CORRECT: Use user object to determine which button to show */}
+        {user ? (
+          <AuthButton onClick={handleLogout}>{t('header.logout', 'Logout')}</AuthButton>
         ) : (
-          <AuthButton onClick={() => navigate('/login')}>{t('header.login') || 'Login'}</AuthButton>
+          <AuthButton onClick={() => navigate('/login')}>{t('header.login', 'Login')}</AuthButton>
         )}
         <HamburgerMenu onClick={toggleMenu}>
           {isMenuOpen ? '✕' : '☰'}
@@ -377,90 +325,26 @@ const Header = () => {
 
       {/* Mobile Menu */}
       <MobileMenu $isOpen={isMenuOpen} dir={isArabic ? 'rtl' : 'ltr'}>
-        <Link
-          to="/"
-          className={activeButton === 'home' ? 'active' : ''}
-          onClick={() => {
-            setActiveButton('home');
-            closeMenu();
-          }}
-        >
-          {t('header.home') || 'Home'}
-        </Link>
-        <Link
-          to="/acplaces"
-          className={activeButton === 'destinations' ? 'active' : ''}
-          onClick={() => {
-            setActiveButton('destinations');
-            closeMenu();
-          }}
-        >
-          {t('header.destinations') || 'Destinations'}
-        </Link>
-        <Link
-          to="/about"
-          className={activeButton === 'about' ? 'active' : ''}
-          onClick={() => {
-            setActiveButton('about');
-            closeMenu();
-          }}
-        >
-          {t('header.about') || 'About Us'}
-        </Link>
-        <Link
-          to="/contact"
-          className={activeButton === 'contact' ? 'active' : ''}
-          onClick={() => {
-            setActiveButton('contact');
-            closeMenu();
-          }}
-        >
-          {t('header.contact') || 'Contact'}
-        </Link>
-        {isLoggedIn ? (
-          <button
-            onClick={handleLogout}
-            style={{
-              background: 'rgba(198, 167, 94, 0.2)',
-              color: '#C6A75E',
-              border: 'none',
-              padding: '12px 16px',
-              borderRadius: '8px',
-              cursor: 'pointer',
-              fontSize: '16px',
-              fontFamily: "'Georgia', serif",
-            }}
-          >
-            {t('header.logout') || 'Logout'}
-          </button>
-        ) : (
-          <Link to="/login" onClick={() => closeMenu()}>
-            {t('header.login') || 'Login'}
-          </Link>
-        )}
-        {isLoggedIn && (
-          <Link
-            to="/profile"
-            className={activeButton === 'profile' ? 'active' : ''}
-            onClick={() => {
-              setActiveButton('profile');
-              closeMenu();
-            }}
-          >
-            {t('header.profile') || 'Profile'}
+        {navLinkItems.map(item => (
+            <Link key={item.name} to={item.to} className={activeButton === item.name ? 'active' : ''} onClick={closeMenu}>
+                {item.label}
+            </Link>
+        ))}
+        {user && (
+          <Link to="/visitor-dashboard/profile" className={activeButton === 'profile' ? 'active' : ''} onClick={closeMenu}>
+            {t('header.profile', 'Profile')}
           </Link>
         )}
         {user && user.role === 'admin' && (
-          <Link
-            to="/admin"
-            className={activeButton === 'admin' ? 'active' : ''}
-            onClick={() => {
-              setActiveButton('admin');
-              closeMenu();
-            }}
-          >
-            {t('header.admin') || 'Admin'}
+          <Link to="/admin" className={activeButton === 'admin' ? 'active' : ''} onClick={closeMenu}>
+            {t('header.admin', 'Admin')}
           </Link>
+        )}
+        {/* Login/Logout buttons for mobile */}
+        {user ? (
+            <AuthButton onClick={handleLogout}>{t('header.logout', 'Logout')}</AuthButton>
+        ) : (
+            <AuthButton onClick={() => { navigate('/login'); closeMenu(); }}>{t('header.login', 'Login')}</AuthButton>
         )}
       </MobileMenu>
     </HeaderContainer>
